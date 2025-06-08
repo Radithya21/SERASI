@@ -1,0 +1,158 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Pengguna {
+  id               Int                @id @default(autoincrement())
+  nama             String             @db.VarChar(100)
+  email            String             @unique @db.VarChar(100)
+  password         String             @db.VarChar(255)
+  // Perbaikan di sini: Hapus @db.Enum
+  role             String             @default("user") @db.VarChar(50) // Ganti menjadi String biasa dengan batasan karakter
+  nip              String?            @db.VarChar(20)
+  jabatan          String?            @db.VarChar(100)
+  departemen       String?            @db.VarChar(100)
+  telepon          String?            @db.VarChar(15)
+  // Perbaikan di sini: Hapus @db.Enum
+  status           String             @default("aktif") @db.VarChar(50) // Ganti menjadi String biasa dengan batasan karakter
+  created_at       DateTime           @default(now()) @db.Timestamp
+  updated_at       DateTime           @default(now()) @updatedAt @db.Timestamp
+  Rapat_created_by Rapat[]            @relation("CreatedBy")
+  PesertaRapat     Peserta_Rapat[]
+  NotulenRapat     Notulen_Rapat[]
+  DokumenRapat     Dokumen_Rapat[]
+  Pengumuman       Pengumuman[]
+  TindakLanjut     Tindak_Lanjut[]
+  LogAktivitas     Log_Aktivitas[]
+}
+
+model Rapat {
+  id            Int                @id @default(autoincrement())
+  judul         String             @db.VarChar(200)
+  deskripsi     String?            @db.Text
+  tanggal       DateTime           @db.Date
+  waktu_mulai   DateTime           @db.Time(0)
+  waktu_selesai DateTime           @db.Time(0)
+  tempat        String             @db.VarChar(200)
+  agenda        String?            @db.Text
+  // Perbaikan di sini: Hapus @db.Enum
+  status        String             @default("dijadwalkan") @db.VarChar(50)
+  created_by    Int
+  created_at    DateTime           @default(now()) @db.Timestamp
+  updated_at    DateTime           @default(now()) @updatedAt @db.Timestamp
+  Pengguna      Pengguna           @relation("CreatedBy", fields: [created_by], references: [id])
+  PesertaRapat  Peserta_Rapat[]
+  NotulenRapat  Notulen_Rapat[]
+  DokumenRapat  Dokumen_Rapat[]
+  Pengumuman    Pengumuman[]
+  TindakLanjut  Tindak_Lanjut[]
+}
+
+model Peserta_Rapat {
+  id               Int      @id @default(autoincrement())
+  rapat_id         Int
+  pengguna_id      Int
+  // Perbaikan di sini: Hapus @db.Enum
+  status_kehadiran String   @default("belum_konfirmasi") @db.VarChar(50)
+  keterangan       String?  @db.VarChar(200)
+  waktu_absen      DateTime? @db.Timestamp
+  created_at       DateTime @default(now()) @db.Timestamp
+  updated_at       DateTime @default(now()) @updatedAt @db.Timestamp
+  Rapat            Rapat    @relation(fields: [rapat_id], references: [id], onDelete: Cascade)
+  Pengguna         Pengguna @relation(fields: [pengguna_id], references: [id])
+
+  @@unique([rapat_id, pengguna_id], name: "unique_participant")
+  @@index([rapat_id], name: "idx_peserta_rapat_rapat")
+  @@index([pengguna_id], name: "idx_peserta_rapat_pengguna")
+}
+
+model Notulen_Rapat {
+  id            Int      @id @default(autoincrement())
+  rapat_id      Int
+  isi_notulen   String   @db.LongText
+  kesimpulan    String?  @db.Text
+  tindak_lanjut String?  @db.Text
+  // Perbaikan di sini: Hapus @db.Enum
+  status        String   @default("draft") @db.VarChar(50)
+  created_by    Int
+  created_at    DateTime @default(now()) @db.Timestamp
+  updated_at    DateTime @default(now()) @updatedAt @db.Timestamp
+  published_at  DateTime? @db.Timestamp
+  Rapat         Rapat    @relation(fields: [rapat_id], references: [id])
+  Pengguna      Pengguna @relation(fields: [created_by], references: [id])
+
+  @@index([rapat_id], name: "idx_notulen_rapat_rapat")
+}
+
+model Dokumen_Rapat {
+  id            Int      @id @default(autoincrement())
+  rapat_id      Int
+  nama_file     String   @db.VarChar(255)
+  nama_asli     String   @db.VarChar(255)
+  path_file     String   @db.VarChar(500)
+  ukuran_file   Int
+  tipe_file     String   @db.VarChar(50)
+  // Perbaikan di sini: Hapus @db.Enum
+  jenis_dokumen String   @default("draft") @db.VarChar(50)
+  deskripsi     String?  @db.Text
+  uploaded_by   Int
+  created_at    DateTime @default(now()) @db.Timestamp
+  Rapat         Rapat    @relation(fields: [rapat_id], references: [id], onDelete: Cascade)
+  Pengguna      Pengguna @relation(fields: [uploaded_by], references: [id])
+
+  @@index([rapat_id], name: "idx_dokumen_rapat_rapat")
+}
+
+model Pengumuman {
+  id               Int      @id @default(autoincrement())
+  judul            String   @db.VarChar(200)
+  isi_pengumuman   String   @db.Text
+  rapat_id         Int?
+  // Perbaikan di sini: Hapus @db.Enum
+  prioritas        String   @default("sedang") @db.VarChar(50)
+  // Perbaikan di sini: Hapus @db.Enum
+  status           String   @default("aktif") @db.VarChar(50)
+  created_by       Int
+  created_at       DateTime @default(now()) @db.Timestamp
+  updated_at       DateTime @default(now()) @updatedAt @db.Timestamp
+  Rapat            Rapat?   @relation(fields: [rapat_id], references: [id])
+  Pengguna         Pengguna @relation(fields: [created_by], references: [id])
+
+  @@index([created_at(sort: Desc)], name: "idx_pengumuman_created_at")
+}
+
+model Tindak_Lanjut {
+  id              Int      @id @default(autoincrement())
+  rapat_id        Int
+  deskripsi_aksi  String   @db.Text
+  pic_pengguna_id Int
+  target_tanggal  DateTime? @db.Date
+  // Perbaikan di sini: Hapus @db.Enum
+  status          String   @default("belum_mulai") @db.VarChar(50)
+  keterangan      String?  @db.Text
+  created_at      DateTime @default(now()) @db.Timestamp
+  updated_at      DateTime @default(now()) @updatedAt @db.Timestamp
+  Rapat           Rapat    @relation(fields: [rapat_id], references: [id])
+  Pengguna        Pengguna @relation(fields: [pic_pengguna_id], references: [id])
+}
+
+model Log_Aktivitas {
+  id              Int      @id @default(autoincrement())
+  pengguna_id     Int
+  aktivitas       String   @db.VarChar(200)
+  deskripsi       String?  @db.Text
+  tabel_terdampak String?  @db.VarChar(50)
+  record_id       Int?
+  ip_address      String?  @db.VarChar(45)
+  user_agent      String?  @db.Text
+  created_at      DateTime @default(now()) @db.Timestamp
+  Pengguna        Pengguna @relation(fields: [pengguna_id], references: [id])
+
+  @@index([pengguna_id, created_at(sort: Desc)], name: "idx_log_aktivitas_pengguna_created")
+}
