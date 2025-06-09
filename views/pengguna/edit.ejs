@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/output.css' />
+</head>
+
+<body class="bg-gray-100 p-4 font-sans antialiased">
+    <div class="container mx-auto bg-white p-6 rounded-lg shadow-md mt-8 max-w-2xl">
+        <h1 class="text-3xl font-bold mb-6 text-gray-800">
+            <%= title %>
+        </h1>
+
+        <% if (error_msg && error_msg.length> 0) { %>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <span class="block sm:inline">
+                    <%= error_msg %>
+                </span>
+            </div>
+            <% } %>
+
+                <form action="/pengguna/edit/<%= pengguna.id %>" method="POST" class="space-y-4">
+                    <div>
+                        <label for="nama" class="block text-sm font-medium text-gray-700">Nama</label>
+                        <input type="text" id="nama" name="nama"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            required value="<%= pengguna.nama %>">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="email" name="email"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            required value="<%= pengguna.email %>">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Password
+                            (Kosongkan jika tidak ingin diubah)</label>
+                        <input type="password" id="password" name="password"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                        <select id="role" name="role"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="user" <%=(pengguna.role==='user' ) ? 'selected' : '' %>>User</option>
+                            <option value="admin" <%=(pengguna.role==='admin' ) ? 'selected' : '' %>>Admin
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="nip" class="block text-sm font-medium text-gray-700">NIP (Opsional)</label>
+                        <input type="text" id="nip" name="nip"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            value="<%= pengguna.nip || '' %>">
+                    </div>
+                    <div>
+                        <label for="jabatan" class="block text-sm font-medium text-gray-700">Jabatan
+                            (Opsional)</label>
+                        <input type="text" id="jabatan" name="jabatan"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            value="<%= pengguna.jabatan || '' %>">
+                    </div>
+                    <div>
+                        <label for="departemen" class="block text-sm font-medium text-gray-700">Departemen
+                            (Opsional)</label>
+                        <input type="text" id="departemen" name="departemen"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            value="<%= pengguna.departemen || '' %>">
+                    </div>
+                    <div>
+                        <label for="telepon" class="block text-sm font-medium text-gray-700">Telepon
+                            (Opsional)</label>
+                        <input type="text" id="telepon" name="telepon"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            value="<%= pengguna.telepon || '' %>">
+                    </div>
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                        <select id="status" name="status"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="aktif" <%=(pengguna.status==='aktif' ) ? 'selected' : '' %>>Aktif
+                            </option>
+                            <option value="nonaktif" <%=(pengguna.status==='nonaktif' ) ? 'selected' : '' %>
+                                >Nonaktif</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <a href="/pengguna"
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md transition duration-300">Batal</a>
+                        <button type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">Simpan
+                            Perubahan</button>
+                    </div>
+                </form>
+    </div>
+</body>
+
+</html>
