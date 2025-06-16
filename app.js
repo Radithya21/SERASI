@@ -8,7 +8,8 @@ const flash = require('connect-flash');     // Tambahkan ini
 
 const indexRouter = require('./routes/index');
 const penggunaRouter = require('./routes/pengguna'); // Tambahkan ini!
-// const rapatRouter = require('./routes/rapat');       // Tambahkan ini!
+const rapatRouter = require('./routes/rapat');       // Tambahkan ini!
+const authRouter = require('./routes/auth'); // Tambahkan ini
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use(session({
   secret: 'your_secret_key_here', // Ganti dengan string acak yang kuat
   resave: false,
   saveUninitialized: true,
-  cookie: { maxAge: 60000 } // Contoh: session berakhir dalam 1 menit
+  cookie: { maxAge: 3600000 } // Perpanjang durasi session menjadi 1 jam
 }));
 app.use(flash());
 
@@ -41,7 +42,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/pengguna', penggunaRouter); // Gunakan router pengguna
-// app.use('/rapat', rapatRouter);         // Gunakan router rapat
+app.use('/rapat', rapatRouter);         // Gunakan router rapat
+app.use('/', authRouter); // Tambahkan ini untuk menghubungkan rute auth
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

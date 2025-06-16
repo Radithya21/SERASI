@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SERASI - Sistem Informasi Universitas Andalas</title>
+    <link rel="stylesheet" href="/stylesheets/output.css">
+</head>
+
+<body
+    class="bg-gradient-to-br from-orange-500 via-orange-400 to-yellow-400 min-h-screen flex items-center justify-center">
+    <div
+        class="container flex bg-white bg-opacity-90 backdrop-blur-lg rounded-3xl shadow-lg overflow-hidden w-[900px] max-w-[95vw] min-h-[550px]">
+        <div
+            class="left-section flex-1 bg-gradient-to-br from-orange-500 to-orange-400 flex flex-col items-center justify-center p-10 text-center relative">
+            <div class="logo-container relative z-10 mb-6">
+                <div class="logo w-auto h-28 rounded-2xl flex items-center justify-center mb-4">
+                    <img src="/images/logoSerasi.png" alt="logo" class="w-30 h-auto">
+                </div>
+                <!-- <div class="logo-text text-4xl font-extrabold text-white tracking-wider mb-2">SERASI</div> -->
+                <div class="subtitle text-white text-opacity-90 text-sm font-medium leading-relaxed max-w-xs">
+                    SISTEM MANAJEMEN RAPAT JURUSAN SISTEM INFORMASI
+                </div>
+            </div>
+            <div
+                class="footer-text absolute bottom-5 left-1/2 transform -translate-x-1/2 text-white text-opacity-80 text-xs">
+                SERASI Sistem Informasi Universitas Andalas 2025
+            </div>
+        </div>
+
+        <div class="right-section flex-1 p-10 flex flex-col justify-center bg-white">
+            <div class="login-header text-center mb-10">
+                <h1 class="login-title text-2xl font-bold text-gray-800 mb-2">Selamat Datang</h1>
+                <p class="login-subtitle text-gray-500 text-sm">Silakan masuk ke akun Anda</p>
+            </div>
+
+            <form action="/login" method="POST">
+                <div class="form-group mb-6">
+                    <label for="email"
+                        class="form-label block mb-2 text-sm font-semibold text-gray-700 uppercase tracking-wide">Email
+                    </label>
+                    <input type="email" id="email" name="email"
+                        class="form-input w-full p-4 border-2 border-gray-200 rounded-lg bg-gray-100 focus:outline-none focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-100"
+                        placeholder="nama@com" required>
+                </div>
+
+                <div class="form-group mb-6">
+                    <label for="password"
+                        class="form-label block mb-2 text-sm font-semibold text-gray-700 uppercase tracking-wide">Kata
+                        Sandi</label>
+                    <input type="password" id="password" name="password"
+                        class="form-input w-full p-4 border-2 border-gray-200 rounded-lg bg-gray-100 focus:outline-none focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-100"
+                        placeholder="Masukkan kata sandi Anda" required>
+                </div>
+
+                <button type="submit"
+                    class="login-button w-full py-4 bg-gradient-to-br from-orange-500 to-orange-400 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-transform duration-300 uppercase tracking-wider">
+                    Masuk
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
