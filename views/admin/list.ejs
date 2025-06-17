@@ -40,10 +40,16 @@
                                             class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
                                             Tambah Pengguna Baru
                                         </a>
-                                        <a href="/pengguna/stats"
-                                            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300 ml-4">
-                                            Lihat Statistik Kehadiran
-                                        </a>
+                                        <div class="flex space-x-2">
+                                            <a href="/pengguna/stats"
+                                                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
+                                                Lihat Statistik Kehadiran
+                                            </a>
+                                            <a href="/pengguna/export/pdf"
+                                                class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
+                                                Export PDF
+                                            </a>
+                                        </div>
                                     </div>
 
                                     <% if (pengguna.length> 0) { %>
@@ -54,16 +60,13 @@
                                                     <tr>
                                                         <th
                                                             class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-600">
+                                                            NIP</th>
+                                                        <th
+                                                            class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-600">
                                                             Nama</th>
                                                         <th
                                                             class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-600">
-                                                            Email</th>
-                                                        <th
-                                                            class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-600">
                                                             Role</th>
-                                                        <th
-                                                            class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-600">
-                                                            Status</th>
                                                         <th
                                                             class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-600">
                                                             Aksi</th>
@@ -74,18 +77,17 @@
                                                         %>
                                                         <tr class="hover:bg-gray-50 transition duration-150">
                                                             <td class="py-3 px-4 border-b text-gray-700">
-                                                                <%= user.nama %>
+                                                                <%= user.nip %>
                                                             </td>
                                                             <td class="py-3 px-4 border-b text-gray-700">
-                                                                <%= user.email %>
+                                                                <%= user.nama || '-' %>
                                                             </td>
                                                             <td class="py-3 px-4 border-b text-gray-700 capitalize">
                                                                 <%= user.role %>
                                                             </td>
-                                                            <td class="py-3 px-4 border-b text-gray-700 capitalize">
-                                                                <%= user.status %>
-                                                            </td>
                                                             <td class="py-3 px-4 border-b text-gray-700">
+                                                                <a href="/pengguna/detail/<%= user.id_pengguna %>"
+                                                                    class="text-blue-600 hover:text-blue-800 text-sm font-medium mr-3">Lihat</a>
                                                                 <a href="/pengguna/edit/<%= user.id_pengguna %>"
                                                                     class="text-indigo-600 hover:text-indigo-800 text-sm font-medium mr-3">Edit</a>
                                                                 <form action="/pengguna/delete/<%= user.id_pengguna %>"

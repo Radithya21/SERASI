@@ -60,35 +60,10 @@
                             value="<%= typeof formData !== 'undefined' ? formData.nip : '' %>">
                     </div>
                     <div>
-                        <label for="jabatan" class="block text-sm font-medium text-gray-700">Jabatan
-                            (Opsional)</label>
-                        <input type="text" id="jabatan" name="jabatan"
-                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            value="<%= typeof formData !== 'undefined' ? formData.jabatan : '' %>">
-                    </div>
-                    <div>
-                        <label for="departemen" class="block text-sm font-medium text-gray-700">Departemen
-                            (Opsional)</label>
-                        <input type="text" id="departemen" name="departemen"
-                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            value="<%= typeof formData !== 'undefined' ? formData.departemen : '' %>">
-                    </div>
-                    <div>
                         <label for="telepon" class="block text-sm font-medium text-gray-700">Telepon
                             (Opsional)</label>
                         <input type="text" id="telepon" name="telepon"
-                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            value="<%= typeof formData !== 'undefined' ? formData.telepon : '' %>">
-                    </div>
-                    <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                        <select id="status" name="status"
                             class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <option value="aktif" <%=(typeof formData !=='undefined' && formData.status==='aktif' )
-                                ? 'selected' : '' %>>Aktif</option>
-                            <option value="nonaktif" <%=(typeof formData !=='undefined' && formData.status==='nonaktif'
-                                ) ? 'selected' : '' %>>Nonaktif</option>
-                        </select>
                     </div>
                     <div class="flex justify-end space-x-3">
                         <a href="/pengguna"

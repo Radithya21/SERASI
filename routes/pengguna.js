@@ -22,4 +22,10 @@ router.post('/delete/:id', penggunaController.deletePengguna); // Gunakan POST u
 // Lihat statistik kehadiran pengguna
 router.get('/stats', penggunaController.getAttendanceStats);
 
+// Lihat detail pengguna
+router.get('/detail/:id', penggunaController.detailPengguna);
+
+// Ekspor daftar pengguna ke PDF
+router.get('/export/pdf', penggunaController.exportPenggunaPDF);
+
 module.exports = router;

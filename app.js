@@ -6,7 +6,6 @@ const logger = require('morgan');
 const session = require('express-session'); // Tambahkan ini
 const flash = require('connect-flash');     // Tambahkan ini
 
-const indexRouter = require('./routes/index');
 const penggunaRouter = require('./routes/pengguna'); // Tambahkan ini!
 const rapatRouter = require('./routes/rapat');       // Tambahkan ini!
 const authRouter = require('./routes/auth'); // Tambahkan ini
@@ -40,7 +39,10 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.get('/', (req, res) => {
+  res.redirect('/login');
+});
+
 app.use('/pengguna', penggunaRouter); // Gunakan router pengguna
 app.use('/rapat', rapatRouter);         // Gunakan router rapat
 app.use('/', authRouter); // Tambahkan ini untuk menghubungkan rute auth
