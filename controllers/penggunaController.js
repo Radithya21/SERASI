@@ -392,3 +392,122 @@ exports.exportPenggunaPDF = async (req, res, next) => {
         res.redirect('/admin/list');
     }
 };
+
+// Halaman absensi
+exports.getAbsensiPage = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const pengguna = await prisma.pengguna.findMany({
+            where: { role: 'user' },
+            orderBy: { nama: 'asc' }
+        });
+
+        const rapat = await prisma.rapat.findUnique({
+            where: { id_rapat: parseInt(id) }
+        });
+
+        if (!rapat) {
+            req.flash('error', 'Rapat tidak ditemukan.');
+            return res.redirect('/admin/list');
+        }
+
+        res.render('admin/absensi', { title: 'Absensi Rapat', pengguna, rapat });
+    } catch (error) {
+        console.error('Error fetching absensi data:', error);
+        req.flash('error', 'Gagal memuat halaman absensi.');
+        next(error);
+    }
+};
+
+// Simpan data absensi
+exports.saveAbsensi = async (req, res, next) => {
+    const { id } = req.params;
+    const absensiData = req.body;
+
+    try {
+        const rapat = await prisma.rapat.findUnique({
+            where: { id_rapat: parseInt(id) }
+        });
+
+        if (!rapat) {
+            req.flash('error', 'Rapat tidak ditemukan.');
+            return res.redirect('/admin/list');
+        }
+
+        const absensiEntries = Object.keys(absensiData).map(key => {
+            console.log(`Processing key: ${key}`); // Log key for debugging
+            if (!key.startsWith('status_kehadiran_')) {
+                throw new Error(`Invalid key format: ${key}`);
+            }
+            const penggunaId = parseInt(key.split('_')[2]);
+            if (isNaN(penggunaId)) {
+                throw new Error(`Invalid pengguna_id extracted from key: ${key}`);
+            }
+            return {
+                id_rapat: parseInt(id),
+                id_pengguna: penggunaId,
+                status_kehadiran: absensiData[key],
+                waktu_absen: absensiData[key] === 'hadir' ? new Date() : null
+            };
+        });
+
+        await prisma.peserta_Rapat.createMany({
+            data: absensiEntries
+        });
+
+        req.flash('success', 'Absensi berhasil disimpan!');
+        res.redirect(`/rapat/detail/${id}`);
+    } catch (error) {
+        console.error('Error saving absensi:', error);
+        req.flash('error', 'Gagal menyimpan absensi.');
+        next(error);
+    }
+};
+
+// Ekspor data absensi ke PDF
+exports.exportAbsensi = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const rapat = await prisma.rapat.findUnique({
+            where: { id_rapat: parseInt(id) },
+            include: {
+                peserta_rapat: {
+                    include: {
+                        pengguna: true
+                    }
+                }
+            }
+        });
+
+        if (!rapat) {
+            req.flash('error', 'Rapat tidak ditemukan.');
+            return res.redirect('/admin/list');
+        }
+
+        const doc = new PDFDocument();
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="Absensi_Rapat_${rapat.judul}.pdf"`);
+
+        doc.pipe(res);
+
+        doc.fontSize(20).text(`Absensi Rapat: ${rapat.judul}`, { align: 'center' });
+        doc.moveDown();
+        doc.fontSize(14).text(`Tanggal: ${rapat.tanggal.toLocaleDateString('id-ID', {
+            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+        })}`);
+        doc.moveDown();
+
+        doc.fontSize(12).text('Daftar Kehadiran:', { underline: true });
+        doc.moveDown();
+
+        rapat.peserta_rapat.forEach((peserta, index) => {
+            doc.text(`${index + 1}. ${peserta.pengguna.nama} - ${peserta.status_kehadiran}`);
+        });
+
+        doc.end();
+    } catch (error) {
+        console.error('Error exporting absensi:', error);
+        req.flash('error', 'Gagal mengekspor absensi.');
+        next(error);
+    }
+};

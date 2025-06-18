@@ -28,4 +28,11 @@ router.get('/detail/:id', penggunaController.detailPengguna);
 // Ekspor daftar pengguna ke PDF
 router.get('/export/pdf', penggunaController.exportPenggunaPDF);
 
+// Halaman absensi
+router.get('/absensi/:id', penggunaController.getAbsensiPage);
+// Proses simpan data absensi
+router.post('/absensi/:id', penggunaController.saveAbsensi);
+// Ekspor data absensi
+router.get('/exportAbsensi/:id', penggunaController.exportAbsensi);
+
 module.exports = router;

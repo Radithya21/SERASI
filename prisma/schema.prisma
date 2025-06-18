@@ -30,8 +30,8 @@ model Rapat {
   id_rapat        Int             @id @default(autoincrement())
   judul           String          @db.VarChar(200)
   tanggal         DateTime
-  waktu_mulai     DateTime
-  waktu_selesai   DateTime
+  waktu_mulai     DateTime?
+  waktu_selesai   DateTime?
   tempat          String          @db.VarChar(200)
   status          String          @db.VarChar(50)
   created_by      Int

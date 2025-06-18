@@ -30,8 +30,9 @@
                                         <h2 class="text-xl font-semibold text-gray-800">
                                             <%= r.judul %>
                                         </h2>
-                                        <p class="text-gray-600">Rabu, <%= r.tanggal.toLocaleDateString('id-ID', {
-                                                day: 'numeric' , month: 'long' , year: 'numeric' }) %>
+                                        <p class="text-gray-600">
+                                            <%= r.tanggal.toLocaleDateString('id-ID', { weekday: 'long' , day: 'numeric'
+                                                , month: 'long' , year: 'numeric' }) %>
                                         </p>
                                     </div>
                                     <div class="flex space-x-4">

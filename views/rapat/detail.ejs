@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" href="/stylesheets/output.css">
+</head>
+
+<body class="bg-gray-100 font-sans antialiased">
+    <div class="flex min-h-screen"> <!-- Membuat flex container -->
+        <% include ../partials/sidebarAdmin %> <!-- Sidebar di kiri -->
+            <div class="flex-1 p-6">
+                <div class="container mx-auto bg-white p-6 rounded-lg shadow-md">
+                    <h1 class="text-3xl font-bold mb-6 text-gray-800">
+                        <%= rapat.judul %>
+                    </h1>
+
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-gray-800">Tanggal: </h3>
+                        <p class="text-gray-600">
+                            <%= new Date(rapat.tanggal).toLocaleDateString('id-ID', { year: 'numeric' , month: 'long' ,
+                                day: 'numeric' }) %>
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-gray-800">Tempat: </h3>
+                        <p class="text-gray-600">
+                            <%= rapat.tempat %>
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-gray-800">Deskripsi: </h3>
+                        <p class="text-gray-600">
+                            <%= rapat.deskripsi || 'Tidak ada deskripsi.' %>
+                        </p>
+                    </div>
+
+                    <!-- Button Actions -->
+                    <div class="mt-6 flex space-x-4">
+                        <!-- Button Kembali -->
+                        <a href="/rapat"
+                            class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md transition duration-300">
+                            Kembali
+                        </a>
+
+                        <!-- Button Edit -->
+                        <a href="/rapat/edit/<%= rapat.id_rapat %>"
+                            class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition duration-300">
+                            Edit
+                        </a>
+
+                        <!-- Button Hapus -->
+                        <form action="/rapat/delete/<%= rapat.id_rapat %>" method="POST"
+                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus rapat ini?');">
+                            <button type="submit"
+                                class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition duration-300">
+                                Hapus
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+</body>
+
+</html>

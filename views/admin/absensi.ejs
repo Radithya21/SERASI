@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/output.css' />
+</head>
+
+<body class="bg-gray-100 font-sans antialiased">
+    <div class="flex">
+        <% include ../partials/sidebarAdmin %>
+            <div class="flex-1 p-4">
+                <div class="container mx-auto bg-white p-6 rounded-lg shadow-md mt-8">
+                    <h1 class="text-3xl font-bold mb-6 text-gray-800">Absensi Rapat</h1>
+                    <h2 class="text-xl font-semibold mb-4 text-gray-700">Judul: <%= rapat.judul %>
+                    </h2>
+                    <h3 class="text-lg mb-6 text-gray-600">Tanggal: <%= rapat.tanggal.toLocaleDateString('id-ID', {
+                            weekday: 'long' , day: 'numeric' , month: 'long' , year: 'numeric' }) %>
+                    </h3>
+
+                    <form action="/pengguna/absensi/<%= rapat.id_rapat %>" method="POST">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-600">Nama
+                                    </th>
+                                    <th class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-600">Email
+                                    </th>
+                                    <th class="py-3 px-4 border-b text-left text-sm font-semibold text-gray-600">Status
+                                        Kehadiran</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% pengguna.forEach(user=> { %>
+                                    <tr class="hover:bg-gray-50 transition duration-150">
+                                        <td class="py-3 px-4 border-b text-gray-700">
+                                            <%= user.nama %>
+                                        </td>
+                                        <td class="py-3 px-4 border-b text-gray-700">
+                                            <%= user.email %>
+                                        </td>
+                                        <td class="py-3 px-4 border-b text-gray-700">
+                                            <select name="status_kehadiran_<%= user.id_pengguna %>"
+                                                class="border border-gray-300 rounded-md p-2">
+                                                <option value="tidak hadir">Tidak Hadir</option>
+                                                <option value="hadir">Hadir</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                        <div class="mt-6">
+                            <button type="submit"
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
+                                Simpan Absensi
+                            </button>
+                            <a href="/pengguna/exportAbsensi/<%= rapat.id_rapat %>"
+                                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300 ml-4">
+                                Export Absensi
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+    </div>
+</body>
+
+</html>
