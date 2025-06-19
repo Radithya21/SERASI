@@ -126,15 +126,22 @@ exports.updatePengguna = async (req, res, next) => {
 exports.deletePengguna = async (req, res, next) => {
     const { id } = req.params;
     try {
+        // Hapus data terkait di tabel peserta_Rapat
+        await prisma.peserta_Rapat.deleteMany({
+            where: { id_pengguna: parseInt(id) }
+        });
+
+        // Hapus data pengguna
         await prisma.pengguna.delete({
             where: { id_pengguna: parseInt(id) }
         });
+
         req.flash('success', 'Pengguna berhasil dihapus!');
         res.redirect('/admin/list');
     } catch (error) {
         console.error("Error deleting pengguna:", error);
         req.flash('error', 'Gagal menghapus pengguna. Mungkin ada data terkait.');
-        next(error); // Tetap next(error) untuk penanganan error global jika diperlukan
+        next(error);
     }
 };
 
@@ -425,6 +432,7 @@ exports.saveAbsensi = async (req, res, next) => {
     const absensiData = req.body;
 
     try {
+        // Ambil data rapat berdasarkan ID
         const rapat = await prisma.rapat.findUnique({
             where: { id_rapat: parseInt(id) }
         });
@@ -434,15 +442,9 @@ exports.saveAbsensi = async (req, res, next) => {
             return res.redirect('/admin/list');
         }
 
+        // Proses data absensi dari request
         const absensiEntries = Object.keys(absensiData).map(key => {
-            console.log(`Processing key: ${key}`); // Log key for debugging
-            if (!key.startsWith('status_kehadiran_')) {
-                throw new Error(`Invalid key format: ${key}`);
-            }
             const penggunaId = parseInt(key.split('_')[2]);
-            if (isNaN(penggunaId)) {
-                throw new Error(`Invalid pengguna_id extracted from key: ${key}`);
-            }
             return {
                 id_rapat: parseInt(id),
                 id_pengguna: penggunaId,
@@ -451,12 +453,26 @@ exports.saveAbsensi = async (req, res, next) => {
             };
         });
 
-        await prisma.peserta_Rapat.createMany({
-            data: absensiEntries
-        });
+        // Simpan atau perbarui data absensi menggunakan upsert
+        for (const entry of absensiEntries) {
+            await prisma.peserta_Rapat.upsert({
+                where: {
+                    id_rapat_id_pengguna: {
+                        id_rapat: entry.id_rapat,
+                        id_pengguna: entry.id_pengguna
+                    }
+                },
+                update: {
+                    status_kehadiran: entry.status_kehadiran,
+                    waktu_absen: entry.waktu_absen
+                },
+                create: entry
+            });
+        }
 
+        // Kirim pesan sukses dan redirect ke halaman absensi
         req.flash('success', 'Absensi berhasil disimpan!');
-        res.redirect(`/rapat/detail/${id}`);
+        res.redirect(`/rapat/absensi/${id}`);
     } catch (error) {
         console.error('Error saving absensi:', error);
         req.flash('error', 'Gagal menyimpan absensi.');
@@ -511,3 +527,4 @@ exports.exportAbsensi = async (req, res, next) => {
         next(error);
     }
 };
+

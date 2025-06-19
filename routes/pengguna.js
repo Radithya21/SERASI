@@ -35,4 +35,5 @@ router.post('/absensi/:id', penggunaController.saveAbsensi);
 // Ekspor data absensi
 router.get('/exportAbsensi/:id', penggunaController.exportAbsensi);
 
+
 module.exports = router;

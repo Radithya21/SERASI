@@ -56,8 +56,8 @@ model Peserta_Rapat {
   updated_at        DateTime       @updatedAt
 
   // Relasi
-  rapat             Rapat          @relation(fields: [id_rapat], references: [id_rapat])
-  pengguna          Pengguna       @relation(fields: [id_pengguna], references: [id_pengguna])
+  rapat             Rapat          @relation(fields: [id_rapat], references: [id_rapat], onDelete: Cascade)
+  pengguna          Pengguna       @relation(fields: [id_pengguna], references: [id_pengguna], onDelete: Cascade)
 
   @@id([id_rapat, id_pengguna])
 }

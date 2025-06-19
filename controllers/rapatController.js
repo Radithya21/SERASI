@@ -159,15 +159,26 @@ exports.getEditRapat = async (req, res) => {
 exports.deleteRapat = async (req, res, next) => {
     const { id } = req.params;
     try {
+        // Pastikan ID valid
+        const rapat = await prisma.rapat.findUnique({
+            where: { id_rapat: parseInt(id) },
+        });
+
+        if (!rapat) {
+            req.flash('error', 'Rapat tidak ditemukan.');
+            return res.redirect('/rapat');
+        }
+
+        // Hapus rapat (data terkait di peserta_rapat akan otomatis terhapus karena cascade delete)
         await prisma.rapat.delete({
-            where: { id_rapat: parseInt(id) }
+            where: { id_rapat: parseInt(id) },
         });
 
         req.flash('success', 'Rapat berhasil dihapus!');
         res.redirect('/rapat');
     } catch (error) {
         console.error('Error deleting rapat:', error);
-        req.flash('error', 'Gagal menghapus rapat.');
+        req.flash('error', 'Gagal menghapus rapat. Silakan coba lagi.');
         next(error);
     }
 };
@@ -314,6 +325,7 @@ exports.exportRiwayatToPDF = async (req, res, next) => {
 exports.getAbsensiPage = async (req, res, next) => {
     const { id } = req.params;
     try {
+        // Ambil data rapat dan absensi yang sudah ada
         const rapat = await prisma.rapat.findUnique({
             where: { id_rapat: parseInt(id) },
             include: {
@@ -330,17 +342,27 @@ exports.getAbsensiPage = async (req, res, next) => {
                 role: 'user'
             }
         });
-        // Ambil semua pengguna
-
-        console.log('Fetched rapat:', rapat);
-        console.log('Fetched pengguna:', pengguna);
 
         if (!rapat || pengguna.length === 0) {
             req.flash('error', 'Data rapat atau pengguna tidak ditemukan.');
             return res.redirect('/rapat');
         }
 
-        res.render('admin/absensi', { title: 'Absensi Rapat', pengguna, rapat });
+        // Gabungkan data pengguna dengan data absensi
+        const absensiData = pengguna.map(user => {
+            const absensi = rapat.peserta_rapat.find(p => p.id_pengguna === user.id_pengguna);
+            return {
+                id_pengguna: user.id_pengguna,
+                nama: user.nama,
+                email: user.email,
+                status_kehadiran: absensi ? absensi.status_kehadiran : 'tidak hadir', // Default 'tidak hadir'
+                waktu_absen: absensi ? absensi.waktu_absen : null
+            };
+        });
+
+        res.render('admin/absensi', { title: 'Absensi Rapat', pengguna: absensiData, rapat });
+        console.log('Data absensi:', rapat.peserta_rapat);
+        console.log('Data pengguna:', pengguna);
     } catch (error) {
         console.error('Error fetching absensi page:', error);
         req.flash('error', 'Gagal memuat halaman absensi.');
