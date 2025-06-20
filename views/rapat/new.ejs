@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/output.css' />
+</head>
+
+<body class="bg-gray-100 font-sans antialiased">
+    <div class="flex min-h-screen">
+        <% include ../partials/sidebarAdmin %> <!-- Sidebar di kiri -->
+
+            <div class="flex-1 p-6">
+                <div class="container mx-auto bg-white p-6 rounded-lg shadow-md">
+                    <h1 class="text-3xl font-bold mb-6 text-gray-800">Buat Rapat Baru</h1>
+
+                    <!-- views/rapat/new.ejs -->
+                    <!-- views/rapat/new.ejs -->
+                    <form action="/rapat/new" method="POST" class="space-y-4">
+                        <div>
+                            <label for="judul" class="block text-sm font-medium text-gray-700">Judul Rapat</label>
+                            <input type="text" id="judul" name="judul" required
+                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <div>
+                            <label for="tanggal" class="block text-sm font-medium text-gray-700">Tanggal</label>
+                            <input type="date" id="tanggal" name="tanggal" required
+                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <div>
+                            <label for="tempat" class="block text-sm font-medium text-gray-700">Tempat</label>
+                            <input type="text" id="tempat" name="tempat" required
+                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <div>
+                            <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                            <textarea id="deskripsi" name="deskripsi" rows="4"
+                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
+                                Simpan
+                            </button>
+                        </div>
+                    </form>
+
+
+                </div>
+            </div>
+    </div>
+</body>
+
+</html>
