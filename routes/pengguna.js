@@ -20,7 +20,7 @@ router.post('/edit/:id', penggunaController.updatePengguna);
 router.post('/delete/:id', penggunaController.deletePengguna); // Gunakan POST untuk delete
 
 // Lihat statistik kehadiran pengguna
-router.get('/stats', penggunaController.getAttendanceStats);
+router.get('/stats', penggunaController.getStatistikaPage);
 
 // Lihat detail pengguna
 router.get('/detail/:id', penggunaController.detailPengguna);
@@ -34,6 +34,7 @@ router.get('/absensi/:id', penggunaController.getAbsensiPage);
 router.post('/absensi/:id', penggunaController.saveAbsensi);
 // Ekspor data absensi
 router.get('/exportAbsensi/:id', penggunaController.exportAbsensi);
+
 
 
 module.exports = router;

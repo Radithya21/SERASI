@@ -528,3 +528,27 @@ exports.exportAbsensi = async (req, res, next) => {
     }
 };
 
+exports.getStatistikaPage = async (req, res, next) => {
+    try {
+        const rapatStats = await prisma.rapat.findMany({
+            include: {
+                peserta_rapat: true
+            },
+            orderBy: { tanggal: 'asc' }
+        });
+
+        const data = rapatStats.map(rapat => ({
+            judul: rapat.judul,
+            totalHadir: rapat.peserta_rapat.filter(peserta => peserta.status_kehadiran === 'hadir').length
+        }));
+
+        console.log('Rapat Stats:', rapatStats);
+        console.log('Data sent to view:', data); // Log tambahan untuk memastikan data dikirim ke view
+
+        res.render('admin/stats', { title: 'Statistika Kehadiran Rapat', data });
+    } catch (error) {
+        console.error("Error fetching statistika data:", error);
+        req.flash('error', 'Gagal memuat data statistika.');
+        next(error);
+    }
+};
