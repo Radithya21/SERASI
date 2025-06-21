@@ -25,9 +25,6 @@ router.get('/stats', penggunaController.getStatistikaPage);
 // Lihat detail pengguna
 router.get('/detail/:id', penggunaController.detailPengguna);
 
-// Ekspor daftar pengguna ke PDF
-router.get('/export/pdf', penggunaController.exportPenggunaPDF);
-
 // Halaman absensi
 router.get('/absensi/:id', penggunaController.getAbsensiPage);
 // Proses simpan data absensi
