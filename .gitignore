@@ -61,3 +61,6 @@ typings/
 .next
 
 /generated/prisma
+/public/stylesheets
+/public/stylesheets/output.css
+/public/stylesheets/style.css
