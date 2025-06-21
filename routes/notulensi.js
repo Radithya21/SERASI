@@ -30,7 +30,5 @@ router.get('/drafts', notulensiController.getDraftNotulensi);
 // Ekspor Notulensi
 router.get('/export/:id', notulensiController.exportNotulensi);
 
-router.get('/arsip', notulensiController.getArsipNotulensi);
-
 module.exports = router;
 

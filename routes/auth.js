@@ -25,7 +25,7 @@ router.get('/admin/edit/:id', authMiddleware.isAuthenticated, authMiddleware.isA
 router.post('/admin/edit/:id', authMiddleware.isAuthenticated, authMiddleware.isAdmin, penggunaController.updatePengguna);
 router.get('/admin/new', authMiddleware.isAuthenticated, authMiddleware.isAdmin, penggunaController.addPenggunaForm);
 router.post('/admin/new', authMiddleware.isAuthenticated, authMiddleware.isAdmin, penggunaController.createPengguna);
-router.get('/admin/stats', authMiddleware.isAuthenticated, authMiddleware.isAdmin, penggunaController.getAttendanceStats);
+router.get('/admin/stats', authMiddleware.isAuthenticated, authMiddleware.isAdmin, penggunaController.getStatistikaPage);
 router.get('/admin/list', authMiddleware.isAuthenticated, authMiddleware.isAdmin, penggunaController.getPengguna);
 
 module.exports = router;

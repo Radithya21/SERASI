@@ -26,9 +26,8 @@
                         </div>
                         <h1 class="text-3xl font-bold text-gray-800">
                             <%= title %>
-                        </h1>
+                        </h1><br>
                     </div>
-                    <p class="text-gray-600">Kelola dan pantau data pengguna sistem</p>
                 </div>
 
                 <!-- Alert Messages -->
@@ -99,18 +98,6 @@
                                                         </path>
                                                     </svg>
                                                     <span class="text-white font-medium">Statistik Kehadiran</span>
-                                                </a>
-
-                                                <a href="/pengguna/export/pdf"
-                                                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center space-x-2">
-                                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                                        </path>
-                                                    </svg>
-                                                    <span class="text-white font-medium">Export PDF</span>
                                                 </a>
                                             </div>
                                         </div>
@@ -300,23 +287,10 @@
                                             <div class="mt-6 pt-4 border-t border-gray-100">
                                                 <div class="flex items-center justify-between text-sm text-gray-600">
                                                     <div class="flex items-center space-x-2">
-                                                        <svg class="w-4 h-4 text-blue-500" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
-                                                            </path>
-                                                        </svg>
                                                         <span>Total: <strong>
                                                                 <%= pengguna.filter(user=> user.role !== 'admin').length
                                                                     %>
                                                             </strong> pengguna</span>
-                                                    </div>
-                                                    <div class="flex items-center space-x-4">
-                                                        <div class="flex items-center space-x-1">
-                                                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                                            <span>Aktif</span>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

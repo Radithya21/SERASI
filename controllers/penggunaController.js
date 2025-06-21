@@ -145,32 +145,6 @@ exports.deletePengguna = async (req, res, next) => {
     }
 };
 
-// Lihat statistik kehadiran peserta
-exports.getAttendanceStats = async (req, res, next) => {
-    try {
-        const attendanceStats = await prisma.pengguna.findMany({
-            include: {
-                peserta_rapat: true
-            },
-            orderBy: { nama: 'asc' }
-        });
-
-        // Hitung jumlah kehadiran dengan kondisi 'hadir'
-        const stats = attendanceStats.map(stat => ({
-            id_pengguna: stat.id_pengguna,
-            nama: stat.nama,
-            email: stat.email,
-            totalHadir: stat.peserta_rapat.filter(peserta => peserta.status_kehadiran === 'hadir').length
-        }));
-
-        res.render('admin/stats', { title: 'Statistik Kehadiran Peserta', attendanceStats: stats });
-    } catch (error) {
-        console.error("Error fetching attendance stats:", error);
-        req.flash('error', 'Gagal memuat statistik kehadiran.'); // Tambahkan flash error
-        next(error);
-    }
-};
-
 // Detail pengguna
 exports.detailPengguna = async (req, res, next) => {
     const { id } = req.params;
@@ -186,216 +160,6 @@ exports.detailPengguna = async (req, res, next) => {
     } catch (error) {
         console.error("Error fetching pengguna details:", error);
         req.flash('error', 'Gagal memuat detail pengguna.');
-        res.redirect('/admin/list');
-    }
-};
-
-// Ekspor daftar pengguna ke PDF
-exports.exportPenggunaPDF = async (req, res, next) => {
-    try {
-        const pengguna = await prisma.pengguna.findMany();
-
-        const doc = new PDFDocument({
-            margin: 40,
-            size: 'A4'
-        });
-
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename="daftar_pengguna.pdf"');
-
-        doc.pipe(res);
-
-        // Header dengan styling yang lebih baik
-        doc.fontSize(20)
-            .font('Helvetica-Bold')
-            .text('Daftar Pengguna', { align: 'center' });
-
-        // Garis pembatas di bawah judul
-        doc.moveTo(40, 80)
-            .lineTo(555, 80)
-            .strokeColor('#cccccc')
-            .lineWidth(1)
-            .stroke();
-
-        doc.moveDown(1.5);
-
-        // Konfigurasi tabel yang lebih baik
-        const tableTop = 110;
-        const rowHeight = 25;
-        const columnWidths = [40, 120, 180, 80, 95];
-        const columnPositions = [40, 80, 200, 380, 460];
-        const tableWidth = 515; // Total width dari margin kiri ke kanan
-
-        // Fungsi untuk menggambar garis horizontal
-        const drawHorizontalLine = (y, strokeColor = '#000000', lineWidth = 0.5) => {
-            doc.moveTo(40, y)
-                .lineTo(555, y)
-                .strokeColor(strokeColor)
-                .lineWidth(lineWidth)
-                .stroke();
-        };
-
-        // Fungsi untuk menggambar garis vertikal
-        const drawVerticalLines = (top, bottom) => {
-            doc.strokeColor('#cccccc').lineWidth(0.5);
-            // Garis vertikal untuk setiap kolom
-            columnPositions.forEach((pos, index) => {
-                if (index === 0) {
-                    // Garis paling kiri
-                    doc.moveTo(40, top).lineTo(40, bottom).stroke();
-                }
-                // Garis pemisah kolom
-                doc.moveTo(pos + columnWidths[index], top)
-                    .lineTo(pos + columnWidths[index], bottom)
-                    .stroke();
-            });
-        };
-
-        // Header tabel dengan background
-        doc.rect(40, tableTop - 5, tableWidth, rowHeight)
-            .fillColor('#f8f9fa')
-            .fill();
-
-        // Teks header tabel
-        doc.fillColor('#000000')
-            .fontSize(12)
-            .font('Helvetica-Bold');
-
-        doc.text('No', columnPositions[0] + 5, tableTop + 5, {
-            width: columnWidths[0] - 10,
-            align: 'center'
-        });
-        doc.text('Nama', columnPositions[1] + 5, tableTop + 5, {
-            width: columnWidths[1] - 10,
-            align: 'left'
-        });
-        doc.text('Email', columnPositions[2] + 5, tableTop + 5, {
-            width: columnWidths[2] - 10,
-            align: 'left'
-        });
-        doc.text('Role', columnPositions[3] + 5, tableTop + 5, {
-            width: columnWidths[3] - 10,
-            align: 'center'
-        });
-        doc.text('NIP', columnPositions[4] + 5, tableTop + 5, {
-            width: columnWidths[4] - 10,
-            align: 'center'
-        });
-
-        // Garis bawah header
-        drawHorizontalLine(tableTop + rowHeight, '#000000', 1);
-
-        // Data rows
-        let currentY = tableTop + rowHeight;
-        doc.fontSize(10).font('Helvetica');
-
-        pengguna.forEach((user, index) => {
-            const rowY = currentY;
-
-            // Alternating row colors untuk kemudahan membaca
-            if (index % 2 === 0) {
-                doc.rect(40, rowY, tableWidth, rowHeight)
-                    .fillColor('#f8f9fa')
-                    .fill();
-            }
-
-            // Reset text color
-            doc.fillColor('#000000');
-
-            // Data dalam setiap kolom
-            doc.text(String(index + 1), columnPositions[0] + 5, rowY + 8, {
-                width: columnWidths[0] - 10,
-                align: 'center'
-            });
-
-            doc.text(user.nama || '-', columnPositions[1] + 5, rowY + 8, {
-                width: columnWidths[1] - 10,
-                align: 'left',
-                ellipsis: true
-            });
-
-            doc.text(user.email || '-', columnPositions[2] + 5, rowY + 8, {
-                width: columnWidths[2] - 10,
-                align: 'left',
-                ellipsis: true
-            });
-
-            doc.text(user.role || '-', columnPositions[3] + 5, rowY + 8, {
-                width: columnWidths[3] - 10,
-                align: 'center'
-            });
-
-            doc.text(user.nip || '-', columnPositions[4] + 5, rowY + 8, {
-                width: columnWidths[4] - 10,
-                align: 'center',
-                ellipsis: true
-            });
-
-            currentY += rowHeight;
-
-            // Cek apakah perlu pindah halaman
-            if (currentY > 750) {
-                doc.addPage();
-                currentY = 50;
-
-                // Ulangi header di halaman baru
-                doc.rect(40, currentY - 5, tableWidth, rowHeight)
-                    .fillColor('#f8f9fa')
-                    .fill();
-
-                doc.fillColor('#000000')
-                    .fontSize(12)
-                    .font('Helvetica-Bold');
-
-                doc.text('No', columnPositions[0] + 5, currentY + 5, {
-                    width: columnWidths[0] - 10,
-                    align: 'center'
-                });
-                doc.text('Nama', columnPositions[1] + 5, currentY + 5, {
-                    width: columnWidths[1] - 10,
-                    align: 'left'
-                });
-                doc.text('Email', columnPositions[2] + 5, currentY + 5, {
-                    width: columnWidths[2] - 10,
-                    align: 'left'
-                });
-                doc.text('Role', columnPositions[3] + 5, currentY + 5, {
-                    width: columnWidths[3] - 10,
-                    align: 'center'
-                });
-                doc.text('NIP', columnPositions[4] + 5, currentY + 5, {
-                    width: columnWidths[4] - 10,
-                    align: 'center'
-                });
-
-                drawHorizontalLine(currentY + rowHeight, '#000000', 1);
-                currentY += rowHeight;
-                doc.fontSize(10).font('Helvetica');
-            }
-        });
-
-        // Gambar border tabel
-        drawVerticalLines(tableTop - 5, currentY);
-        drawHorizontalLine(currentY, '#000000', 1);
-
-        // Footer dengan informasi tambahan
-        const footerY = currentY + 30;
-        doc.fontSize(8)
-            .fillColor('#666666')
-            .text(`Dicetak pada: ${new Date().toLocaleDateString('id-ID', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            })}`, 40, footerY);
-
-        doc.text(`Total Pengguna: ${pengguna.length}`, 40, footerY + 12);
-
-        doc.end();
-    } catch (error) {
-        console.error('Error exporting PDF:', error);
-        req.flash('error', 'Gagal mengekspor daftar pengguna.');
         res.redirect('/admin/list');
     }
 };
@@ -528,3 +292,171 @@ exports.exportAbsensi = async (req, res, next) => {
     }
 };
 
+exports.getStatistikaPage = async (req, res, next) => {
+    try {
+        const rapatStats = await prisma.rapat.findMany({
+            include: {
+                peserta_rapat: true
+            },
+            orderBy: { tanggal: 'asc' }
+        });
+
+        const data = rapatStats.map(rapat => ({
+            judul: rapat.judul,
+            totalHadir: rapat.peserta_rapat.filter(peserta => peserta.status_kehadiran === 'hadir').length
+        }));
+
+        console.log('Rapat Stats:', rapatStats);
+        console.log('Data sent to view:', data); // Log tambahan untuk memastikan data dikirim ke view
+
+        res.render('admin/stats', { title: 'Statistika Kehadiran Rapat', data });
+    } catch (error) {
+        console.error("Error fetching statistika data:", error);
+        req.flash('error', 'Gagal memuat data statistika.');
+        next(error);
+    }
+};
+
+// Fungsi untuk mendapatkan rapat yang akan datang
+exports.getUpcomingRapat = async (req, res) => {
+    try {
+        // Ambil tanggal sekarang
+        const currentDate = new Date();
+
+        // Ambil semua rapat dengan tanggal lebih besar dari tanggal sekarang
+        const upcomingRapat = await prisma.rapat.findMany({
+            where: {
+                tanggal: {
+                    gt: currentDate,  // gt = greater than (lebih besar dari)
+                }
+            },
+            orderBy: {
+                tanggal: 'asc'  // Urutkan berdasarkan tanggal (ascending)
+            }
+        });
+
+        // Render ke tampilan jadwal.ejs dengan data rapat yang akan datang
+        res.render('pengguna/jadwal', {
+            title: 'Jadwal Rapat',
+            rapat: upcomingRapat,
+        });
+    } catch (error) {
+        console.error("Terjadi kesalahan saat mengambil jadwal rapat:", error);
+        res.status(500).send("Terjadi kesalahan di server.");
+    }
+};
+
+exports.getRiwayatRapat = async (req, res, next) => {
+    try {
+        // Ambil semua rapat yang sudah selesai (tanggal lebih kecil dari hari ini)
+        const riwayatRapat = await prisma.rapat.findMany({
+            where: {
+                tanggal: {
+                    lt: new Date(),  // Hanya mengambil rapat yang sudah selesai
+                }
+            },
+            orderBy: {
+                tanggal: 'desc',  // Urutkan berdasarkan tanggal terbaru
+            }
+        });
+
+        // Render riwayat rapat untuk pengguna
+        res.render('pengguna/riwayat', {
+            title: 'Riwayat Rapat',
+            rapat: riwayatRapat, // Data rapat yang sudah selesai
+        });
+    } catch (error) {
+        console.error('Error fetching riwayat rapat:', error);
+        req.flash('error', 'Gagal memuat riwayat rapat.');
+        next(error);
+    }
+};
+
+exports.getDetailRapat = async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        const rapat = await prisma.rapat.findUnique({
+            where: { id_rapat: parseInt(id) },
+            include: {
+                peserta_rapat: {
+                    include: {
+                        pengguna: true
+                    }
+                }
+            }
+        });
+
+        if (!rapat) {
+            req.flash('error', 'Rapat tidak ditemukan.');
+            return res.redirect('/pengguna/riwayat');
+        }
+
+        res.render('pengguna/details', { title: 'Detail Rapat', rapat });
+    } catch (error) {
+        console.error('Error fetching detail rapat:', error);
+        req.flash('error', 'Gagal memuat detail rapat.');
+        next(error);
+    }
+};
+
+// Di dalam penggunaController.js
+
+exports.getDetailRiwayat = async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        // Mengambil detail rapat berdasarkan id
+        const riwayat = await prisma.rapat.findUnique({
+            where: { id_rapat: parseInt(id) },
+            include: {
+                peserta_rapat: {
+                    include: {
+                        pengguna: true
+                    }
+                }
+            }
+        });
+
+        // Jika rapat tidak ditemukan, tampilkan pesan error
+        if (!riwayat) {
+            req.flash('error', 'Rapat tidak ditemukan.');
+            return res.redirect('/pengguna/riwayat'); // Redirect kembali ke halaman riwayat
+        }
+
+        // Render halaman detail riwayat
+        res.render('riwayat/detail', { title: 'Detail Riwayat Rapat', riwayat });
+    } catch (error) {
+        console.error('Error fetching detail riwayat rapat:', error);
+        req.flash('error', 'Gagal memuat detail riwayat rapat.');
+        next(error);
+    }
+};
+
+// Di dalam penggunaController.js
+
+exports.getDashboard = async (req, res, next) => {
+    try {
+        // Ambil rapat yang akan datang dengan judul "Pengumuman Rapat DSI"
+        const upcomingRapat = await prisma.rapat.findFirst({
+            where: {
+                tanggal: {
+                    gt: new Date(),  // Rapat yang tanggalnya lebih besar dari hari ini
+                }
+            },
+            orderBy: {
+                tanggal: 'asc', // Urutkan berdasarkan tanggal rapat yang akan datang
+            }
+        });
+
+        // Kirim data pengumuman rapat ke tampilan dashboard
+        res.render('pengguna/dashboard', {
+            title: 'User Dashboard',
+            upcomingRapat : upcomingRapat,
+        });
+    } catch (error) {
+        console.error('Error fetching upcoming rapat for announcement:', error);
+        req.flash('error', 'Gagal memuat pengumuman rapat.');
+        next(error);
+    }
+};

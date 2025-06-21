@@ -1,6 +1,8 @@
+// controllers/notulensiController.js
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const PDFDocument = require('pdfkit');
+
 
 exports.getDaftarNotulensi = async (req, res, next) => {
     try {
@@ -9,13 +11,16 @@ exports.getDaftarNotulensi = async (req, res, next) => {
         const notulensiList = await prisma.notulen_Rapat.findMany({
             orderBy: { updated_at: 'desc' }, // Menggunakan updated_at untuk pengurutan
             include: { // Mengambil data rapat terkait jika diperlukan
-                rapat: true
+                rapat: true 
             }
         });
         console.log(`Berhasil mengambil ${notulensiList.length} notulensi.`);
 
-        res.render('notulensi/list', {
-            title: 'Daftar Notulensi',
+        // Log untuk melihat data yang akan dilewatkan ke view
+        // console.log('Data yang akan dirender di list.ejs:', notulensiList);
+
+        res.render('notulensi/list', { 
+            title: 'Daftar Notulensi', 
             notulensiList: notulensiList,
             success_msg: req.flash('success'), // Meneruskan pesan flash
             error_msg: req.flash('error')
@@ -24,9 +29,11 @@ exports.getDaftarNotulensi = async (req, res, next) => {
 
     } catch (error) {
         console.error('ERROR di getDaftarNotulensi:', error);
-        console.error(error.stack);
+        // Log stack trace lengkap untuk membantu debugging
+        console.error(error.stack); 
         req.flash('error', 'Gagal memuat daftar notulensi. Silakan coba lagi nanti.');
-        res.redirect('/');
+        // next(error); // Biarkan error handler global menanganinya
+        res.redirect('/'); // Atau redirect ke halaman utama atau halaman error khusus jika Anda mau
     }
 };
 
@@ -37,8 +44,8 @@ exports.showFormCreateNotulensi = async (req, res) => {
             orderBy: { tanggal: 'desc' }
         });
         console.log(`Berhasil mengambil ${rapatList.length} rapat untuk form.`);
-        res.render('notulensi/form', {
-            title: 'Buat Notulensi Baru',
+        res.render('notulensi/form', { 
+            title: 'Buat Notulensi Baru', 
             notulensi: null,
             rapatList: rapatList,
             isEdit: false,
@@ -55,8 +62,9 @@ exports.showFormCreateNotulensi = async (req, res) => {
 };
 
 exports.createNotulensi = async (req, res, next) => {
+    // ... (kode yang sama seperti sebelumnya, tambahkan console.log jika diperlukan)
     const { judul, isi_notulen, status, rapatId } = req.body;
-    const userId = req.session.user ? req.session.user.id_pengguna : 1;
+    const userId = req.session.user ? req.session.user.id_pengguna : 1; 
 
     try {
         console.log('Memulai createNotulensi dengan data:', { judul, isi_notulen, status, rapatId, userId });
@@ -91,6 +99,7 @@ exports.createNotulensi = async (req, res, next) => {
 };
 
 exports.getDetailNotulensi = async (req, res, next) => {
+    // ... (kode yang sama seperti sebelumnya, tambahkan console.log jika diperlukan)
     const { id } = req.params;
     try {
         console.log(`Memulai getDetailNotulensi untuk ID: ${id}`);
@@ -111,7 +120,7 @@ exports.getDetailNotulensi = async (req, res, next) => {
             return res.redirect('/notulensi');
         }
         console.log('Notulensi ditemukan:', notulensi.id_notulen);
-        res.render('notulensi/detail', {
+        res.render('notulensi/detail', { 
             title: notulensi.rapat ? notulensi.rapat.judul : 'Detail Notulensi',
             notulensi: notulensi,
             success_msg: req.flash('success'),
@@ -127,6 +136,7 @@ exports.getDetailNotulensi = async (req, res, next) => {
 };
 
 exports.showFormEditNotulensi = async (req, res, next) => {
+    // ... (kode yang sama seperti sebelumnya, tambahkan console.log jika diperlukan)
     const { id } = req.params;
     try {
         console.log(`Memulai showFormEditNotulensi untuk ID: ${id}`);
@@ -145,8 +155,8 @@ exports.showFormEditNotulensi = async (req, res, next) => {
             orderBy: { tanggal: 'desc' }
         });
         console.log('Notulensi ditemukan dan rapatList diambil.');
-        res.render('notulensi/form', {
-            title: `Edit Notulensi: ${notulensi.rapat ? notulensi.rapat.judul : 'Tanpa Judul Rapat'}`,
+        res.render('notulensi/form', { 
+            title: `Edit Notulensi: ${notulensi.rapat ? notulensi.rapat.judul : 'Tanpa Judul Rapat'}`, 
             notulensi: notulensi,
             rapatList: rapatList,
             isEdit: true,
@@ -163,8 +173,9 @@ exports.showFormEditNotulensi = async (req, res, next) => {
 };
 
 exports.updateNotulensi = async (req, res, next) => {
+    // ... (kode yang sama seperti sebelumnya, tambahkan console.log jika diperlukan)
     const { id } = req.params;
-    const { isi_notulen, status, rapatId } = req.body; // rapatId tetap ada, walaupun tidak digunakan langsung di update data notulen
+    const { isi_notulen, status, rapatId } = req.body;
 
     try {
         console.log(`Memulai updateNotulensi untuk ID: ${id} dengan status: ${status}`);
@@ -178,13 +189,11 @@ exports.updateNotulensi = async (req, res, next) => {
                 where: { id_notulen: parseInt(id) },
                 select: { published_at: true }
             });
-            // Atur published_at hanya jika sebelumnya belum ada
             if (!currentNotulen.published_at) {
                 updatedData.published_at = new Date();
                 console.log('published_at diatur karena status uploaded.');
             }
         } else {
-            // Jika status bukan 'uploaded', pastikan published_at di-null-kan jika sebelumnya ada
             updatedData.published_at = null;
         }
 
@@ -204,6 +213,7 @@ exports.updateNotulensi = async (req, res, next) => {
 };
 
 exports.deleteNotulensi = async (req, res, next) => {
+    // ... (kode yang sama seperti sebelumnya, tambahkan console.log jika diperlukan)
     const { id } = req.params;
     try {
         console.log(`Memulai deleteNotulensi untuk ID: ${id}`);
@@ -222,6 +232,7 @@ exports.deleteNotulensi = async (req, res, next) => {
 };
 
 exports.getDraftNotulensi = async (req, res, next) => {
+    // ... (kode yang sama seperti sebelumnya, tambahkan console.log jika diperlukan)
     try {
         console.log('Memulai getDraftNotulensi...');
         const draftNotulensiList = await prisma.notulen_Rapat.findMany({
@@ -230,8 +241,8 @@ exports.getDraftNotulensi = async (req, res, next) => {
             include: { rapat: true }
         });
         console.log(`Berhasil mengambil ${draftNotulensiList.length} draft notulensi.`);
-        res.render('notulensi/drafts', {
-            title: 'Draft Notulensi',
+        res.render('notulensi/drafts', { 
+            title: 'Draft Notulensi', 
             draftNotulensiList: draftNotulensiList,
             success_msg: req.flash('success'),
             error_msg: req.flash('error')
@@ -251,12 +262,12 @@ exports.exportNotulensi = async (req, res, next) => {
         console.log(`Memulai exportNotulensi untuk ID: ${id}`);
         const notulensi = await prisma.notulen_Rapat.findUnique({
             where: { id_notulen: parseInt(id) },
-            include: {
+            include: { 
                 rapat: {
                     include: {
                         dokumen: true
                     }
-                }
+                } 
             }
         });
 
@@ -265,39 +276,123 @@ exports.exportNotulensi = async (req, res, next) => {
             req.flash('error', 'Notulensi tidak ditemukan.');
             return res.redirect('/notulensi');
         }
-        console.log('Notulensi ditemukan untuk ekspor.');
-        // Bangun konten yang akan diekspor
-        const rapatJudul = notulensi.rapat ? notulensi.rapat.judul : 'Rapat Tidak Diketahui';
-        const dokumentasiFiles = notulensi.rapat && notulensi.rapat.dokumen.length > 0
-            ? notulensi.rapat.dokumen.map(doc => `- ${doc.nama_file}`).join('\n')
-            : 'Tidak ada dokumen terkait.';
 
-        const exportContent = `
-Notulensi Rapat
-========================
+        const doc = new PDFDocument({ margin: 50 });
+        const filename = `notulensi_rapat_${notulensi.id_notulen}.pdf`;
 
-Judul Rapat: ${rapatJudul}
-Tanggal Rapat: ${notulensi.rapat ? new Date(notulensi.rapat.tanggal).toLocaleDateString('id-ID') : 'Tidak Diketahui'}
-Waktu: ${notulensi.rapat ? `${new Date(notulensi.rapat.waktu_mulai).toLocaleTimeString('id-ID')} - ${new Date(notulensi.rapat.waktu_selesai).toLocaleTimeString('id-ID')}` : 'Tidak Diketahui'}
-Tempat: ${notulensi.rapat ? notulensi.rapat.tempat : 'Tidak Diketahui'}
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-Type', 'application/pdf');
+        doc.pipe(res);
 
-Isi Notulensi:
-------------------------
-${notulensi.isi_notulen}
+        const rapat = notulensi.rapat;
 
-Status: ${notulensi.status === 'draft' ? 'Draft' : 'Diunggah'}
-Dibuat Oleh: ${notulensi.created_by} (ID Pengguna)
-Tanggal Dibuat: ${new Date(notulensi.updated_at).toLocaleDateString('id-ID')}
-Tanggal Diterbitkan: ${notulensi.published_at ? new Date(notulensi.published_at).toLocaleDateString('id-ID') : 'Belum Diterbitkan'}
+// Header dengan garis bawah
+        doc
+            .fontSize(26)
+            .font('Helvetica-Bold')
+            .fillColor('#2E4053')
+            .text('NOTULENSI RAPAT', { align: 'center' })
+            .moveDown(0.5);
+        doc
+            .moveTo(50, doc.y)
+            .lineTo(545, doc.y)
+            .strokeColor('#2E4053')
+            .lineWidth(2)
+            .stroke()
+            .moveDown(1.5);
 
-Dokumentasi Terkait Rapat:
-------------------------
-${dokumentasiFiles}
-`;
-        res.setHeader('Content-Type', 'text/plain');
-        res.setHeader('Content-Disposition', `attachment; filename="notulensi_rapat_${rapatJudul.replace(/\s/g, '_')}.txt"`); // Menambahkan ekstensi .txt
-        res.send(exportContent);
-        console.log('Notulensi berhasil diekspor.');
+        // Info rapat
+        doc
+            .fontSize(13)
+            .font('Helvetica-Bold')
+            .fillColor('black')
+            .text(`Judul Rapat: `, { continued: true })
+            .font('Helvetica')
+            .text(`${rapat?.judul || '-'}`)
+            .font('Helvetica-Bold')
+            .text(`Tanggal Rapat: `, { continued: true })
+            .font('Helvetica')
+            .text(`${rapat?.tanggal ? new Date(rapat.tanggal).toLocaleDateString('id-ID') : '-'}`)
+            .font('Helvetica-Bold')
+            .text(`Waktu: `, { continued: true })
+            .font('Helvetica')
+            .text(`${rapat?.waktu_mulai ? `${new Date(rapat.waktu_mulai).toLocaleTimeString('id-ID')} - ${new Date(rapat.waktu_selesai).toLocaleTimeString('id-ID')}` : '-'}`)
+            .font('Helvetica-Bold')
+            .text(`Tempat: `, { continued: true })
+            .font('Helvetica')
+            .text(`${rapat?.tempat || '-'}`)
+            .moveDown();
+
+        // Garis pemisah
+        doc
+            .moveTo(50, doc.y)
+            .lineTo(545, doc.y)
+            .strokeColor('#ABB2B9')
+            .lineWidth(1)
+            .stroke()
+            .moveDown();
+
+        // Isi Notulensi
+        doc
+            .fontSize(14)
+            .font('Helvetica-Bold')
+            .fillColor('#154360')
+            .text('Isi Notulensi', { underline: true })
+            .moveDown(0.5);
+        doc
+            .font('Helvetica')
+            .fontSize(12)
+            .fillColor('black')
+            .text(notulensi.isi_notulen || '-', { align: 'justify' })
+            .moveDown();
+
+        // Info tambahan
+        doc
+            .fontSize(12)
+            .font('Helvetica-Bold')
+            .text('Status: ', { continued: true })
+            .font('Helvetica')
+            .text(`${notulensi.status}`)
+            .font('Helvetica-Bold')
+            .text('Dibuat oleh ID: ', { continued: true })
+            .font('Helvetica')
+            .text(`${notulensi.created_by}`)
+            .font('Helvetica-Bold')
+            .text('Tanggal Dibuat: ', { continued: true })
+            .font('Helvetica')
+            .text(`${new Date(notulensi.updated_at).toLocaleDateString('id-ID')}`)
+            .font('Helvetica-Bold')
+            .text('Tanggal Diterbitkan: ', { continued: true })
+            .font('Helvetica')
+            .text(`${notulensi.published_at ? new Date(notulensi.published_at).toLocaleDateString('id-ID') : '-'}`)
+            .moveDown();
+
+        // Dokumentasi Terkait
+        doc
+            .fontSize(13)
+            .font('Helvetica-Bold')
+            .fillColor('#154360')
+            .text('Dokumentasi Terkait', { underline: true })
+            .moveDown(0.5);
+        doc.font('Helvetica').fillColor('black');
+        if (rapat?.dokumen?.length > 0) {
+            rapat.dokumen.forEach((docItem, i) => {
+                doc.text(`${i + 1}. ${docItem.nama_file}`);
+            });
+        } else {
+            doc.text('Tidak ada dokumen terkait.');
+        }
+
+        // Footer
+        doc.moveDown(2);
+        doc
+            .fontSize(10)
+            .fillColor('#7B7D7D')
+            .text('---', { align: 'center' })
+            .text('SERASI - Sistem Notulensi Rapat', { align: 'center' });
+
+        doc.end(); // Menutup stream PDF
+        console.log('Notulensi berhasil diekspor sebagai PDF.');
 
     } catch (error) {
         console.error('ERROR di exportNotulensi:', error);
@@ -307,36 +402,29 @@ ${dokumentasiFiles}
     }
 };
 
-// --- Fungsi Baru untuk Arsip Notulensi ---
-exports.getArsipNotulensi = async (req, res, next) => {
+exports.createNotulensiDraft = async (req, res, next) => {
+    const { isi_notulen, deskripsi, rapatId } = req.body;
+    const userId = req.session.user ? req.session.user.id_pengguna : 1;
+
     try {
-        console.log('Memulai getArsipNotulensi...');
-        // Mengambil notulensi yang dianggap "diarsipkan" (misal: status 'uploaded')
-        const arsipList = await prisma.notulen_Rapat.findMany({
-            where: { status: 'uploaded' }, // Filter berdasarkan status 'uploaded'
-            orderBy: { published_at: 'desc' }, // Urutkan berdasarkan tanggal publikasi terbaru
-            include: { // Sertakan data rapat terkait jika diperlukan
-                rapat: {
-                    include: {
-                        dokumen: true // Sertakan dokumen terkait rapat jika ada
-                    }
-                }
+        console.log('Memulai createNotulensiDraft...');
+        const newDraft = await prisma.notulen_Rapat.create({
+            data: {
+                id_rapat: parseInt(rapatId),
+                isi_notulen: isi_notulen || '',
+                deskripsi: deskripsi || '',
+                status: 'draft',
+                created_by: userId,
+                published_at: null,
             }
         });
-        console.log(`Berhasil mengambil ${arsipList.length} notulensi arsip.`);
-
-        res.render('notulensi/arsip', { // Render view 'notulensi/arsip.ejs'
-            title: 'Arsip Notulensi',
-            arsip: arsipList, // Kirim data notulensi arsip ke view dengan nama 'arsip'
-            success_msg: req.flash('success'),
-            error_msg: req.flash('error')
-        });
-        console.log('Berhasil merender notulensi/arsip.ejs.');
-
+        console.log('Draft notulensi berhasil dibuat:', newDraft.id_notulen);
+        req.flash('success', 'Draft notulensi berhasil disimpan.');
+        res.redirect('/draft'); // arahkan ke halaman draft
     } catch (error) {
-        console.error('ERROR di getArsipNotulensi:', error);
+        console.error('ERROR di createNotulensiDraft:', error);
         console.error(error.stack);
-        req.flash('error', 'Gagal memuat arsip notulensi. Silakan coba lagi nanti.');
-        res.redirect('/');
+        req.flash('error', 'Gagal menyimpan draft notulensi.');
+        next(error);
     }
-}; 
+};
