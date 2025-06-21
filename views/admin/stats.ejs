@@ -11,35 +11,40 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-50 min-h-screen p-6">
-    <div class="max-w-4xl mx-auto">
-        <!-- Header dengan tombol back -->
-        <div class="flex items-center mb-6">
+<body class="bg-gray-100 min-h-screen p-8 antialiased">
+    <div class="max-w-10xl mx-auto">
+        <div class="flex items-center mb-8">
             <button onclick="window.location.href='/admin/list'"
-                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mr-4 text-sm">
-                ← Kembali
+                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded-lg shadow-md transition duration-300 ease-in-out text-base flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                        clip-rule="evenodd" />
+                </svg>
+                Kembali
             </button>
-            <h1 class="text-2xl font-bold text-gray-800">Statistika Kehadiran Rapat</h1>
+            <h1 class="text-3xl font-extrabold text-gray-900 ml-6">Statistika Kehadiran Rapat</h1>
         </div>
 
-        <!-- Chart Container -->
-        <div class="bg-white rounded-lg shadow p-6 mb-6">
-            <canvas id="attendanceChart" class="w-full" height="300"></canvas>
+        <div class="bg-white rounded-xl shadow-lg p-7 mb-8 border border-gray-200">
+            <canvas id="attendanceChart" class="w-full" height="350"></canvas>
         </div>
 
-        <!-- Info Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white rounded-lg shadow p-4 text-center">
-                <h3 class="text-sm text-gray-600 mb-1">Total Rapat</h3>
-                <p class="text-xl font-bold text-blue-600" id="totalMeetings">-</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div
+                class="bg-white rounded-xl shadow-md p-6 text-center border border-gray-200 transform hover:scale-105 transition duration-300 ease-in-out">
+                <h3 class="text-base text-gray-600 mb-2 font-semibold">Total Rapat</h3>
+                <p class="text-3xl font-extrabold text-blue-700" id="totalMeetings">-</p>
             </div>
-            <div class="bg-white rounded-lg shadow p-4 text-center">
-                <h3 class="text-sm text-gray-600 mb-1">Rata-rata Kehadiran</h3>
-                <p class="text-xl font-bold text-green-600" id="avgAttendance">-</p>
+            <div
+                class="bg-white rounded-xl shadow-md p-6 text-center border border-gray-200 transform hover:scale-105 transition duration-300 ease-in-out">
+                <h3 class="text-base text-gray-600 mb-2 font-semibold">Rata-rata Kehadiran</h3>
+                <p class="text-3xl font-extrabold text-green-700" id="avgAttendance">-</p>
             </div>
-            <div class="bg-white rounded-lg shadow p-4 text-center">
-                <h3 class="text-sm text-gray-600 mb-1">Kehadiran Tertinggi</h3>
-                <p class="text-xl font-bold text-orange-600" id="maxAttendance">-</p>
+            <div
+                class="bg-white rounded-xl shadow-md p-6 text-center border border-gray-200 transform hover:scale-105 transition duration-300 ease-in-out">
+                <h3 class="text-base text-gray-600 mb-2 font-semibold">Kehadiran Tertinggi</h3>
+                <p class="text-3xl font-extrabold text-orange-700" id="maxAttendance">-</p>
             </div>
         </div>
     </div>
@@ -65,11 +70,16 @@
                 datasets: [{
                     label: 'Jumlah Kehadiran',
                     data: values,
-                    borderColor: '#3B82F6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 2,
+                    borderColor: '#2563EB', // Biru yang lebih gelap
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)', // Sedikit lebih pekat
+                    borderWidth: 2.5, // Sedikit lebih tebal
                     fill: true,
-                    tension: 0.3
+                    tension: 0.4, // Sedikit lebih melengkung
+                    pointBackgroundColor: '#2563EB', // Warna titik data
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 1,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 }]
             },
             options: {
@@ -78,12 +88,51 @@
                 plugins: {
                     legend: {
                         display: true,
-                        position: 'top'
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 14,
+                                weight: '600' // Font semi-bold untuk legenda
+                            },
+                            color: '#333'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleFont: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 14
+                        },
+                        padding: 10,
+                        cornerRadius: 6
                     }
                 },
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: {
+                            color: '#E5E7EB' // Warna grid yang lebih terang
+                        },
+                        ticks: {
+                            font: {
+                                size: 12
+                            },
+                            color: '#555'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false // Sembunyikan grid vertikal
+                        },
+                        ticks: {
+                            font: {
+                                size: 12
+                            },
+                            color: '#555'
+                        }
                     }
                 }
             }
