@@ -32,6 +32,21 @@ router.post('/absensi/:id', penggunaController.saveAbsensi);
 // Ekspor data absensi
 router.get('/exportAbsensi/:id', penggunaController.exportAbsensi);
 
+// Rute untuk melihat jadwal rapat (hanya untuk user)
+router.get('/jadwal', penggunaController.getUpcomingRapat);  // Menggunakan fungsi getUpcomingRapat untuk menampilkan jadwal rapat
+
+// Rute untuk melihat riwayat rapat
+router.get('/riwayat', penggunaController.getRiwayatRapat);  // Menampilkan riwayat rapat
+
+// Lihat detail rapat
+router.get('/details/:id', penggunaController.getDetailRapat);
+
+// Lihat detail riwayat rapat (mengarah ke penggunaController.getDetailRiwayat)
+router.get('/riwayat/detail/:id', penggunaController.getDetailRiwayat);
+
+// Halaman dashboard pengguna
+router.get('/dashboard', penggunaController.getDashboard);
+
 
 
 module.exports = router;

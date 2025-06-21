@@ -255,19 +255,39 @@ exports.exportRiwayatToPDF = async (req, res, next) => {
         // Menyediakan header
         doc.fontSize(18).text('Riwayat Rapat', { align: 'center' }).moveDown(2);
 
-        // Menambahkan tabel untuk daftar rapat
-        doc.fontSize(12).text('Judul\t\tTanggal\t\tTempat', { align: 'left' }).moveDown(1);
+        // Menambahkan tabel header
+        const tableTop = 150;
+        const rowHeight = 20;
+        const columnWidths = [150, 100, 100]; // Menentukan lebar kolom
+        doc.fontSize(12);
+        
+        // Header Tabel
+        doc.text('Judul', columnWidths[0], tableTop);
+        doc.text('Tanggal', columnWidths[0] + columnWidths[0], tableTop);
+        doc.text('Tempat', columnWidths[0] + columnWidths[0] + columnWidths[1], tableTop);
+        
+        // Garis Bawah Header
+        doc.moveTo(columnWidths[0], tableTop + rowHeight)
+           .lineTo(columnWidths[0] + columnWidths[0] + columnWidths[1] + columnWidths[2], tableTop + rowHeight)
+           .stroke();
 
-        // Loop untuk menambahkan setiap rapat ke PDF
+        let currentRow = tableTop + rowHeight + 10;
+        
+        // Menambahkan data rapat ke dalam tabel
         riwayatRapat.forEach((rapat) => {
-            // Format tanggal dengan locale Indonesia
-            const formattedDate = new Date(rapat.tanggal).toLocaleDateString('id-ID');
+            const formattedDate = new Date(rapat.tanggal).toLocaleDateString('id-ID'); // Format tanggal
 
-            // Menambahkan data rapat ke PDF
-            doc.text(`
-                ${rapat.judul}\t${formattedDate}\t${rapat.tempat},
-                { align: 'left' }
-           `).moveDown(0.5);
+            // Menambahkan baris data ke tabel
+            doc.text(rapat.judul, columnWidths[0], currentRow);
+            doc.text(formattedDate, columnWidths[0] + columnWidths[0], currentRow);
+            doc.text(rapat.tempat, columnWidths[0] + columnWidths[0] + columnWidths[1], currentRow);
+
+            // Garis Bawah Baris Data
+            doc.moveTo(columnWidths[0], currentRow + rowHeight)
+               .lineTo(columnWidths[0] + columnWidths[0] + columnWidths[1] + columnWidths[2], currentRow + rowHeight)
+               .stroke();
+
+            currentRow += rowHeight + 10;
         });
 
         // Mengirim PDF ke client
@@ -369,5 +389,74 @@ exports.getAbsensiPage = async (req, res, next) => {
         console.error('Error fetching absensi page:', error);
         req.flash('error', 'Gagal memuat halaman absensi.');
         next(error);
+    }
+};
+
+// Fungsi untuk ekspor daftar rapat yang akan datang ke PDF menggunakan PDFKit
+exports.exportUpcomingRapatToPDF = async (req, res, next) => {
+    try {
+        const upcomingRapat = await prisma.rapat.findMany({
+            where: {
+                tanggal: {
+                    gt: new Date(), // Mengambil rapat yang tanggalnya lebih besar dari tanggal sekarang
+                },
+            },
+            orderBy: {
+                tanggal: 'asc', // Urutkan berdasarkan tanggal yang akan datang
+            },
+        });
+
+        // Membuat dokumen PDF
+        const doc = new PDFDocument();
+
+        // Mengatur ukuran kertas dan margin
+        doc.page.margins = { top: 50, left: 50, bottom: 50, right: 50 };
+
+        // Menyediakan header
+        doc.fontSize(18).text('Daftar Rapat yang Akan Datang', { align: 'center' }).moveDown(2);
+
+        // Menambahkan tabel header
+        const tableTop = 150;
+        const rowHeight = 20;
+        const columnWidths = [150, 100, 100]; // Menentukan lebar kolom
+        doc.fontSize(12);
+
+        // Header Tabel
+        doc.text('Judul', columnWidths[0], tableTop);
+        doc.text('Tanggal', columnWidths[0] + columnWidths[0], tableTop);
+        doc.text('Tempat', columnWidths[0] + columnWidths[0] + columnWidths[1], tableTop);
+
+        // Garis Bawah Header
+        doc.moveTo(columnWidths[0], tableTop + rowHeight)
+           .lineTo(columnWidths[0] + columnWidths[0] + columnWidths[1] + columnWidths[2], tableTop + rowHeight)
+           .stroke();
+
+        let currentRow = tableTop + rowHeight + 10;
+
+        // Menambahkan data rapat ke dalam tabel
+        upcomingRapat.forEach((rapat) => {
+            const formattedDate = new Date(rapat.tanggal).toLocaleDateString('id-ID'); // Format tanggal
+
+            // Menambahkan baris data ke tabel
+            doc.text(rapat.judul, columnWidths[0], currentRow);
+            doc.text(formattedDate, columnWidths[0] + columnWidths[0], currentRow);
+            doc.text(rapat.tempat, columnWidths[0] + columnWidths[0] + columnWidths[1], currentRow);
+
+            // Garis Bawah Baris Data
+            doc.moveTo(columnWidths[0], currentRow + rowHeight)
+               .lineTo(columnWidths[0] + columnWidths[0] + columnWidths[1] + columnWidths[2], currentRow + rowHeight)
+               .stroke();
+
+            currentRow += rowHeight + 10;
+        });
+
+        // Mengirim PDF ke client
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=daftar_rapat_akan_datang.pdf');
+        doc.pipe(res);
+        doc.end();
+
+    } catch (err) {
+        next(err);
     }
 };
