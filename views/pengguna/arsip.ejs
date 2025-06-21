@@ -1,0 +1,37 @@
+<!-- views/rapat/arsip.ejs -->
+
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/output.css">
+</head>
+
+<body class="bg-gray-100">
+    <div class="flex min-h-screen">
+        <% include ../partials/sidebarAdmin %> <!-- Sidebar di kiri -->
+
+        <div class="flex-1 p-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Arsip Rapat</h1>
+            <% if (rapat.length > 0) { %>
+                <ul class="space-y-4">
+                    <% rapat.forEach(item => { %>
+                        <li class="bg-white p-4 rounded-lg shadow-md">
+                            <h2 class="text-xl font-semibold"><%= item.judul %></h2>
+                            <p class="text-gray-600">Tanggal: <%= new Date(item.tanggal).toLocaleDateString('id-ID') %></p>
+                            <p class="text-gray-600">Tempat: <%= item.tempat %></p>
+                            <a href="/rapat/detail/<%= item.id_rapat %>" class="text-blue-500 hover:underline">Lihat Detail</a>
+                        </li>
+                    <% }) %>
+                </ul>
+            <% } else { %>
+                <p class="text-gray-600">Tidak ada arsip rapat.</p>
+            <% } %>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -316,3 +316,147 @@ exports.getStatistikaPage = async (req, res, next) => {
         next(error);
     }
 };
+
+// Fungsi untuk mendapatkan rapat yang akan datang
+exports.getUpcomingRapat = async (req, res) => {
+    try {
+        // Ambil tanggal sekarang
+        const currentDate = new Date();
+
+        // Ambil semua rapat dengan tanggal lebih besar dari tanggal sekarang
+        const upcomingRapat = await prisma.rapat.findMany({
+            where: {
+                tanggal: {
+                    gt: currentDate,  // gt = greater than (lebih besar dari)
+                }
+            },
+            orderBy: {
+                tanggal: 'asc'  // Urutkan berdasarkan tanggal (ascending)
+            }
+        });
+
+        // Render ke tampilan jadwal.ejs dengan data rapat yang akan datang
+        res.render('pengguna/jadwal', {
+            title: 'Jadwal Rapat',
+            rapat: upcomingRapat,
+        });
+    } catch (error) {
+        console.error("Terjadi kesalahan saat mengambil jadwal rapat:", error);
+        res.status(500).send("Terjadi kesalahan di server.");
+    }
+};
+
+exports.getRiwayatRapat = async (req, res, next) => {
+    try {
+        // Ambil semua rapat yang sudah selesai (tanggal lebih kecil dari hari ini)
+        const riwayatRapat = await prisma.rapat.findMany({
+            where: {
+                tanggal: {
+                    lt: new Date(),  // Hanya mengambil rapat yang sudah selesai
+                }
+            },
+            orderBy: {
+                tanggal: 'desc',  // Urutkan berdasarkan tanggal terbaru
+            }
+        });
+
+        // Render riwayat rapat untuk pengguna
+        res.render('pengguna/riwayat', {
+            title: 'Riwayat Rapat',
+            rapat: riwayatRapat, // Data rapat yang sudah selesai
+        });
+    } catch (error) {
+        console.error('Error fetching riwayat rapat:', error);
+        req.flash('error', 'Gagal memuat riwayat rapat.');
+        next(error);
+    }
+};
+
+exports.getDetailRapat = async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        const rapat = await prisma.rapat.findUnique({
+            where: { id_rapat: parseInt(id) },
+            include: {
+                peserta_rapat: {
+                    include: {
+                        pengguna: true
+                    }
+                }
+            }
+        });
+
+        if (!rapat) {
+            req.flash('error', 'Rapat tidak ditemukan.');
+            return res.redirect('/pengguna/riwayat');
+        }
+
+        res.render('pengguna/details', { title: 'Detail Rapat', rapat });
+    } catch (error) {
+        console.error('Error fetching detail rapat:', error);
+        req.flash('error', 'Gagal memuat detail rapat.');
+        next(error);
+    }
+};
+
+// Di dalam penggunaController.js
+
+exports.getDetailRiwayat = async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        // Mengambil detail rapat berdasarkan id
+        const riwayat = await prisma.rapat.findUnique({
+            where: { id_rapat: parseInt(id) },
+            include: {
+                peserta_rapat: {
+                    include: {
+                        pengguna: true
+                    }
+                }
+            }
+        });
+
+        // Jika rapat tidak ditemukan, tampilkan pesan error
+        if (!riwayat) {
+            req.flash('error', 'Rapat tidak ditemukan.');
+            return res.redirect('/pengguna/riwayat'); // Redirect kembali ke halaman riwayat
+        }
+
+        // Render halaman detail riwayat
+        res.render('riwayat/detail', { title: 'Detail Riwayat Rapat', riwayat });
+    } catch (error) {
+        console.error('Error fetching detail riwayat rapat:', error);
+        req.flash('error', 'Gagal memuat detail riwayat rapat.');
+        next(error);
+    }
+};
+
+// Di dalam penggunaController.js
+
+exports.getDashboard = async (req, res, next) => {
+    try {
+        // Ambil rapat yang akan datang dengan judul "Pengumuman Rapat DSI"
+        const upcomingRapat = await prisma.rapat.findFirst({
+            where: {
+                tanggal: {
+                    gt: new Date(),  // Rapat yang tanggalnya lebih besar dari hari ini
+                }
+            },
+            orderBy: {
+                tanggal: 'asc', // Urutkan berdasarkan tanggal rapat yang akan datang
+            }
+        });
+
+        // Kirim data pengumuman rapat ke tampilan dashboard
+        res.render('pengguna/dashboard', {
+            title: 'User Dashboard',
+            upcomingRapat : upcomingRapat,
+        });
+    } catch (error) {
+        console.error('Error fetching upcoming rapat for announcement:', error);
+        req.flash('error', 'Gagal memuat pengumuman rapat.');
+        next(error);
+    }
+};

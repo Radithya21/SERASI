@@ -35,7 +35,7 @@ exports.login = async (req, res) => {
             if (user.role === 'admin') {
                 res.redirect('/admin/dashboard');  // Jika admin, arahkan ke dashboard admin
             } else if (user.role === 'user') {
-                res.redirect('/dashboard');       // Jika user, arahkan ke dashboard user
+                res.redirect('pengguna/dashboard');       // Jika user, arahkan ke dashboard user
             } else {
                 req.flash('error', 'Role tidak valid.');
                 res.redirect('/login');
