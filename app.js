@@ -6,9 +6,11 @@ const logger = require('morgan');
 const session = require('express-session');
 const flash = require('connect-flash');
 
-const penggunaRouter = require('./routes/pengguna'); 
-const rapatRouter = require('./routes/rapat');       
-const authRouter = require('./routes/auth'); 
+const penggunaRouter = require('./routes/pengguna'); // Tambahkan ini!
+const rapatRouter = require('./routes/rapat');       // Tambahkan ini!
+const authRouter = require('./routes/auth'); // Tambahkan ini
+const notulensiRouter = require('./routes/notulensi');
+const arsipRouter = require('./routes/arsip'); //Tambahkan ini
 
 const app = express();
 
@@ -46,7 +48,9 @@ app.get('/', (req, res) => {
 
 app.use('/pengguna', penggunaRouter); // Gunakan router pengguna
 app.use('/rapat', rapatRouter);         // Gunakan router rapat
-app.use('/', authRouter); // Menghubungkan rute auth
+app.use('/notulensi', notulensiRouter);
+app.use('/', authRouter); // Tambahkan ini untuk menghubungkan rute auth
+app.use('/arsip', arsipRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
