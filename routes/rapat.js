@@ -47,5 +47,7 @@ router.get('/export/upcoming/rapat/pdf', authMiddleware.isAuthenticated, rapatCo
 // Route untuk halaman statistik mingguan
 router.get('/riwayat/statistik', authMiddleware.isAuthenticated, rapatController.getStatistikMingguan);
 
+// Route untuk halaman statistik rapat (baru)
+router.get('/statistik', authMiddleware.isAuthenticated, rapatController.getStatistikRapat);
 
 module.exports = router;

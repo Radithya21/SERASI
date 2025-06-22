@@ -532,3 +532,74 @@ exports.getStatistikMingguan = async (req, res, next) => {
         next(err);
     }
 };
+
+// Statistik rapat lengkap (untuk halaman /rapat/statistik)
+exports.getStatistikRapat = async (req, res, next) => {
+    try {
+        // Ambil semua rapat
+        const semuaRapat = await prisma.rapat.findMany({
+            orderBy: { tanggal: 'desc' }
+        });
+
+        // Hitung total rapat
+        const totalRapat = semuaRapat.length;
+
+        // Hitung rapat selesai (tanggal sudah lewat)
+        const rapatSelesai = semuaRapat.filter(rapat => new Date(rapat.tanggal) < new Date()).length;
+
+        // Hitung rapat minggu ini
+        const sekarang = new Date();
+        const awalMinggu = new Date(sekarang);
+        awalMinggu.setDate(sekarang.getDate() - sekarang.getDay());
+        awalMinggu.setHours(0, 0, 0, 0);
+        
+        const akhirMinggu = new Date(awalMinggu);
+        akhirMinggu.setDate(awalMinggu.getDate() + 6);
+        akhirMinggu.setHours(23, 59, 59, 999);
+
+        const rapatMingguIni = semuaRapat.filter(rapat => {
+            const tanggalRapat = new Date(rapat.tanggal);
+            return tanggalRapat >= awalMinggu && tanggalRapat <= akhirMinggu;
+        }).length;
+
+        // Hitung statistik per minggu untuk 8 minggu terakhir
+        const weeklyData = [];
+        const sekarang2 = new Date();
+        
+        for (let i = 7; i >= 0; i--) {
+            const awalMinggu2 = new Date(sekarang2);
+            awalMinggu2.setDate(sekarang2.getDate() - sekarang2.getDay() - (i * 7));
+            awalMinggu2.setHours(0, 0, 0, 0);
+            
+            const akhirMinggu2 = new Date(awalMinggu2);
+            akhirMinggu2.setDate(awalMinggu2.getDate() + 6);
+            akhirMinggu2.setHours(23, 59, 59, 999);
+
+            const jumlahRapat = semuaRapat.filter(rapat => {
+                const tanggalRapat = new Date(rapat.tanggal);
+                return tanggalRapat >= awalMinggu2 && tanggalRapat <= akhirMinggu2;
+            }).length;
+
+            const weekLabel = `Minggu ${i === 0 ? 'Ini' : i === 1 ? 'Lalu' : `${i} minggu lalu`}`;
+            
+            weeklyData.push({
+                weekLabel: weekLabel,
+                count: jumlahRapat,
+                startDate: awalMinggu2,
+                endDate: akhirMinggu2
+            });
+        }
+
+        res.render('rapat/statistik', {
+            title: 'Statistik Rapat',
+            totalRapat,
+            rapatSelesai,
+            rapatMingguIni,
+            weeklyData
+        });
+    } catch (error) {
+        console.error('Error fetching statistik rapat:', error);
+        req.flash('error', 'Gagal memuat statistik rapat.');
+        next(error);
+    }
+};
