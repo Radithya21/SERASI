@@ -16,49 +16,53 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="flex flex-col w-full relative z-10">
-        <a href="/pengguna/dashboard"
-            class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mb-1">
-            <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
-            <img src="/images/Vector.png" alt="Dashboard Icon"
-                class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
-            <span class="text-sm font-medium tracking-wide relative z-10">Dashboard</span>
-        </a>
+    <nav class="flex flex-col justify-between w-full relative z-10 flex-grow">
+        <div>
+            <a href="/pengguna/dashboard"
+                class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mb-1">
+                <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
+                <img src="/images/Vector.png" alt="Dashboard Icon"
+                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
+                <span class="text-sm font-medium tracking-wide relative z-10">Dashboard</span>
+            </a>
 
-        <div class="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent my-2"></div>
+            <div class="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent my-2"></div>
 
-        <a href="/pengguna/jadwal"
-            class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mb-1">
-            <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
-            <img src="/images/jadwal.png" alt="Jadwal Icon"
-                class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
-            <span class="text-sm font-medium tracking-wide relative z-10">Jadwal</span>
-        </a>
+            <a href="/pengguna/jadwal"
+                class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mb-1">
+                <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
+                <img src="/images/jadwal.png" alt="Jadwal Icon"
+                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
+                <span class="text-sm font-medium tracking-wide relative z-10">Jadwal</span>
+            </a>
 
-        <a href="/pengguna/riwayat"
-            class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mb-1">
-            <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
-            <img src="/images/riwayat.png" alt="Riwayat Icon"
-                class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
-            <span class="text-sm font-medium tracking-wide relative z-10">Riwayat</span>
-        </a>
+            <a href="/pengguna/riwayat"
+                class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mb-1">
+                <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
+                <img src="/images/riwayat.png" alt="Riwayat Icon"
+                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
+                <span class="text-sm font-medium tracking-wide relative z-10">Riwayat</span>
+            </a>
 
-        <a href="/pengguna/arsip"
-            class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mb-1">
-            <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
-            <img src="/images/arsip.png" alt="Arsip Icon"
-                class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
-            <span class="text-sm font-medium tracking-wide relative z-10">Arsip</span>
-        </a>
+            <a href="/pengguna/arsip"
+                class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mb-1">
+                <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
+                <img src="/images/arsip.png" alt="Arsip Icon"
+                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
+                <span class="text-sm font-medium tracking-wide relative z-10">Arsip</span>
+            </a>
+        </div>
 
-        <div class="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent my-2 mt-4"></div>
+        <div>
+            <div class="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent my-2 mt-4"></div>
 
-        <a href="/logout"
-            class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mt-2 border-t border-white/20">
-            <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
-            <img src="/images/logout.png" alt="Logout Icon"
-                class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
-            <span class="text-sm font-medium tracking-wide relative z-10">Logout</span>
-        </a>
+            <a href="/logout"
+                class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mt-2 border-t border-white/20">
+                <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
+                <img src="/images/logout.png" alt="Logout Icon"
+                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
+                <span class="text-sm font-medium tracking-wide relative z-10">Logout</span>
+            </a>
+        </div>
     </nav>
 </div> 

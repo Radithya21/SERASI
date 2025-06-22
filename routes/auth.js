@@ -27,5 +27,7 @@ router.get('/admin/new', authMiddleware.isAuthenticated, authMiddleware.isAdmin,
 router.post('/admin/new', authMiddleware.isAuthenticated, authMiddleware.isAdmin, penggunaController.createPengguna);
 router.get('/admin/stats', authMiddleware.isAuthenticated, authMiddleware.isAdmin, penggunaController.getStatistikaPage);
 router.get('/admin/list', authMiddleware.isAuthenticated, authMiddleware.isAdmin, penggunaController.getPengguna);
+router.get('/admin/detail/:id', authMiddleware.isAuthenticated, authMiddleware.isAdmin, penggunaController.detailPengguna);
+router.post('/admin/delete/:id', authMiddleware.isAuthenticated, authMiddleware.isAdmin, penggunaController.deletePengguna);
 
 module.exports = router;

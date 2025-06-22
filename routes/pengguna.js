@@ -7,8 +7,11 @@ const { isAuthenticated } = require('../middleware/authMiddleware');
 // Terapkan middleware autentikasi ke semua route
 router.use(isAuthenticated);
 
-// Daftar semua pengguna
-router.get('/', penggunaController.getPengguna);
+// Dashboard pengguna (bukan daftar pengguna untuk admin)
+router.get('/', penggunaController.getDashboard);
+
+// Daftar semua pengguna (untuk admin) - pindah ke route yang lebih spesifik
+router.get('/list', penggunaController.getPengguna);
 
 // Tampilkan form tambah pengguna
 router.get('/add', penggunaController.addPenggunaForm);

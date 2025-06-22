@@ -10,11 +10,12 @@
     <link rel="stylesheet" href="/stylesheets/output.css">
 </head>
 
-<body class="bg-gray-100 font-sans antialiased">
-    <div class="flex min-h-screen">
-        <% include ../partials/sidebar %> <!-- Sidebar di kiri -->
-
-        <div class="flex-1 p-6">
+<body class="bg-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <div class="sticky top-0 h-screen">
+            <% include ../partials/sidebar %>
+        </div>
+        <div class="flex-1 p-6 overflow-y-auto">
             <div class="container mx-auto bg-white p-6 rounded-lg shadow-md">
                 <!-- Header dengan icon -->
                 <div class="flex items-center justify-between mb-6">
