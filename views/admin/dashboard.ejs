@@ -10,11 +10,49 @@
 
 <body class="bg-gray-100 font-sans antialiased">
     <div class="flex">
-        <% include ../partials/sidebarAdmin %> <!-- Sidebar tetap di sisi kiri -->
-            <div class="flex-1 p-6">
-                <div class="container mx-auto bg-white p-6 rounded-lg shadow-md mt-8">
-                    <h1 class="text-3xl font-bold mb-6 text-gray-800">Admin Dashboard</h1>
-                    <p class="text-gray-600">Selamat datang, Admin!</p>
+        <% include ../partials/sidebarAdmin %>
+            <div class="flex-1 p-4">
+                <div class="container mx-auto">
+                    <!-- Header sederhana -->
+                    <div class="mb-6">
+                        <h1 class="text-2xl font-bold text-gray-800">Dashboard Admin</h1>
+                        <p class="text-gray-600">Departemen Sistem Informasi</p>
+                    </div>
+
+                    <!-- Welcome Card sederhana -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Selamat Datang, Admin!</h2>
+                        <p class="text-gray-600">Kelola sistem rapat departemen sistem informasi universitas andalas</p>
+                    </div>
+
+                    <!-- Penjelasan SERASI -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Tentang SERASI</h2>
+                        <div class="space-y-3 text-gray-600">
+                            <p><strong>SERASI</strong> adalah Sistem Rapat Digital yang dirancang khusus untuk departemen sistem informasi universitas andalas.</p>
+                            <p>Sistem ini memudahkan pengelolaan rapat, absensi, dan notulensi secara digital dengan fitur-fitur:</p>
+                            <ul class="list-disc list-inside ml-4 space-y-1">
+                                <li>Manajemen pengguna dan hak akses</li>
+                                <li>Penjadwalan dan pengelolaan rapat</li>
+                                <li>Pencatatan absensi digital</li>
+                                <li>Pembuatan dan penyimpanan notulensi</li>
+                                <li>Arsip dokumen rapat</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links sederhana -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Akses Cepat</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="/pengguna" class="block bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md text-center transition duration-300">
+                                Kelola Pengguna
+                            </a>
+                            <a href="/rapat" class="block bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-md text-center transition duration-300">
+                                Kelola Rapat
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
     </div>
