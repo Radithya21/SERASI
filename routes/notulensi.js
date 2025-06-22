@@ -8,11 +8,13 @@ const { isAuthenticated } = require('../middleware/authMiddleware');
 // Terapkan middleware autentikasi ke semua route
 router.use(isAuthenticated);
 
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'public/uploads/dokumentasi'),
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
 const upload = multer({ storage });
+
 
 // Daftar Notulensi (main view)
 router.get('/', notulensiController.getDaftarNotulensi);

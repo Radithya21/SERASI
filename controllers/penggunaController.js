@@ -464,6 +464,7 @@ exports.getDashboard = async (req, res, next) => {
 
         // Hitung jumlah total rapat
         const totalRapat = await prisma.rapat.count({
+
             where: {
                 tanggal: {
                     gt: new Date(), // Hanya rapat yang akan datang
@@ -488,6 +489,7 @@ exports.getDashboard = async (req, res, next) => {
             take: limit,  // Ambil hanya jumlah yang ditentukan per halaman
         });
 
+
         const totalPages = Math.ceil(totalRapat / limit);  // Hitung total halaman
 
         // Kirim data rapat ke tampilan pengguna
@@ -496,6 +498,7 @@ exports.getDashboard = async (req, res, next) => {
             upcomingRapat: upcomingRapat,  // Kirimkan daftar rapat yang akan datang
             currentPage: page,  // Halaman saat ini
             totalPages: totalPages,  // Total halaman
+
         });
 
     } catch (error) {
@@ -621,5 +624,6 @@ exports.getArsipNotulensiSebelumnya = async (req, res, next) => {
         console.error('Error fetching notulensi sebelumnya:', error);
         req.flash('error', 'Gagal memuat notulensi sebelumnya.');
         next(error);
+
     }
 };
