@@ -118,17 +118,6 @@ exports.getEditRapat = async (req, res) => {
 exports.deleteRapat = async (req, res, next) => {
     const { id } = req.params;
     try {
-        // Pastikan ID valid
-        const rapat = await prisma.rapat.findUnique({
-            where: { id_rapat: parseInt(id) },
-        });
-
-        if (!rapat) {
-            req.flash('error', 'Rapat tidak ditemukan.');
-            return res.redirect('/rapat');
-        }
-
-        // Hapus rapat (data terkait di peserta_rapat akan otomatis terhapus karena cascade delete)
         await prisma.rapat.delete({
             where: { id_rapat: parseInt(id) },
         });
@@ -136,9 +125,13 @@ exports.deleteRapat = async (req, res, next) => {
         req.flash('success', 'Rapat berhasil dihapus!');
         res.redirect('/rapat');
     } catch (error) {
-        console.error('Error deleting rapat:', error);
-        req.flash('error', 'Gagal menghapus rapat. Silakan coba lagi.');
-        next(error);
+        if (error.code === 'P2003') {
+            req.flash('error', 'Rapat tidak dapat dihapus karena sudah memiliki notulensi terkait.');
+        } else {
+            console.error('Error deleting rapat:', error);
+            req.flash('error', 'Gagal menghapus rapat. Silakan coba lagi.');
+        }
+        res.redirect('back');
     }
 };
 
