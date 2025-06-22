@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/stylesheets/output.css">
+</head>
+<body class="bg-[#FDF2E9] font-sans antialiased">
+  <div class="flex min-h-screen">
+    <% include ../partials/sidebarAdmin %>
+    <div class="flex-1 h-screen overflow-y-auto p-10">
+      <div class="bg-white p-8 rounded-md shadow-md">
+        <a href="/arsip" class="text-blue-600 hover:underline mb-4 inline-block">&larr; Kembali ke Arsip</a>
+        <h1 class="text-2xl font-bold mb-6">Detail Notulensi</h1>
+        <% if (notulen) { %>
+          <div class="mb-4">
+            <h2 class="text-xl font-semibold mb-2"><%= notulen.rapat?.judul || 'Judul Rapat Tidak Ditemukan' %></h2>
+            <p class="text-gray-600 mb-1">Tanggal: <%= new Date(notulen.rapat.tanggal).toLocaleDateString('id-ID') %></p>
+            <p class="text-gray-600 mb-1">Tempat: <%= notulen.rapat.tempat %></p>
+            <p class="text-gray-600 mb-4">Waktu: <%= notulen.rapat?.waktu || '10.00 WIB' %></p>
+          </div>
+          <div class="mb-6">
+            <h3 class="font-semibold mb-2">Isi Notulensi:</h3>
+            <div class="bg-gray-50 p-3 rounded text-gray-700 whitespace-pre-line"><%= notulen.isi_notulen %></div>
+          </div>
+          <% if (notulensiLain && notulensiLain.length > 0) { %>
+            <div class="mt-8">
+              <h3 class="font-semibold mb-2">Notulensi Sebelumnya:</h3>
+              <ul class="space-y-2">
+                <% notulensiLain.forEach(item => { %>
+                  <li class="border rounded p-2 bg-gray-50 flex justify-between items-center">
+                    <div>
+                      <span class="font-semibold"><%= item.rapat?.judul || 'Tanpa Judul' %></span>
+                      <span class="text-xs text-gray-500 ml-2"><%= new Date(item.rapat.tanggal).toLocaleDateString('id-ID') %></span>
+                    </div>
+                    <a href="/arsip/detail/<%= item.id_notulen %>" class="text-blue-600 hover:underline">Lihat Detail</a>
+                  </li>
+                <% }) %>
+              </ul>
+            </div>
+          <% } %>
+        <% } else { %>
+          <p class="text-gray-600">Notulensi tidak ditemukan.</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

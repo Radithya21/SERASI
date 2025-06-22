@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notulensi Sebelumnya</title>
+    <link rel="stylesheet" href="/stylesheets/output.css">
+</head>
+<body class="bg-gray-100">
+    <div class="flex min-h-screen">
+        <% include ../partials/sidebarAdmin %>
+        <div class="flex-1 p-6">
+            <a href="/pengguna/arsip" class="text-blue-600 hover:underline mb-4 inline-block">&larr; Kembali ke Arsip</a>
+            <h1 class="text-2xl font-bold mb-6">Notulensi Sebelumnya</h1>
+            <% if (notulensiLain && notulensiLain.length > 0) { %>
+                <ul class="space-y-4">
+                    <% notulensiLain.forEach(item => { %>
+                        <li class="bg-white p-4 rounded shadow flex flex-col">
+                            <span class="font-semibold text-lg"><%= item.rapat?.judul || 'Tanpa Judul' %></span>
+                            <span class="text-gray-500 text-sm mb-2">Tanggal: <%= new Date(item.rapat.tanggal).toLocaleDateString('id-ID') %></span>
+                            <div class="bg-gray-50 p-3 rounded text-gray-700 whitespace-pre-line"><%= item.isi_notulen %></div>
+                        </li>
+                    <% }) %>
+                </ul>
+            <% } else { %>
+                <p class="text-gray-600">Belum ada notulensi sebelumnya yang diunggah.</p>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>

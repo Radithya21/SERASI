@@ -40,6 +40,9 @@ router.get('/absensi/:id', authMiddleware.isAuthenticated, rapatController.getAb
 // Route untuk ekspor daftar rapat yang akan datang ke PDF
 router.get('/export/upcoming/rapat/pdf', authMiddleware.isAuthenticated, rapatController.exportUpcomingRapatToPDF);
 
+// Route untuk halaman statistik mingguan
+router.get('/riwayat/statistik', authMiddleware.isAuthenticated, rapatController.getStatistikMingguan);
+
 
 
 module.exports = router;

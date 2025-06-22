@@ -1,7 +1,14 @@
 // routes/notulensiRoutes.js
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const notulensiController = require('../controllers/notulensiController');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'public/uploads/dokumentasi'),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
+});
+const upload = multer({ storage });
 
 // Daftar Notulensi (main view)
 router.get('/', notulensiController.getDaftarNotulensi);
@@ -10,7 +17,7 @@ router.get('/', notulensiController.getDaftarNotulensi);
 router.get('/form', notulensiController.showFormCreateNotulensi);
 
 // Simpan Notulensi baru
-router.post('/new', notulensiController.createNotulensi);
+router.post('/new', upload.array('dokumentasi'), notulensiController.createNotulensi);
 
 // Detail Notulensi
 router.get('/detail/:id', notulensiController.getDetailNotulensi);
@@ -19,7 +26,7 @@ router.get('/detail/:id', notulensiController.getDetailNotulensi);
 router.get('/edit/:id', notulensiController.showFormEditNotulensi);
 
 // Update Notulensi
-router.post('/edit/:id', notulensiController.updateNotulensi);
+router.post('/edit/:id', upload.array('dokumentasi'), notulensiController.updateNotulensi);
 
 // Hapus Notulensi
 router.post('/delete/:id', notulensiController.deleteNotulensi);
