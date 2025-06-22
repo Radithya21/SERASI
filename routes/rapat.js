@@ -4,17 +4,20 @@ const router = express.Router();
 const rapatController = require('../controllers/rapatController');
 const authMiddleware = require('../middleware/authMiddleware'); // Impor middleware
 
+// Terapkan middleware autentikasi ke semua route
+router.use(authMiddleware.isAuthenticated);
+
 // Daftar rapat
-router.get('/', authMiddleware.isAuthenticated, rapatController.getDaftarRapat);
+router.get('/', rapatController.getDaftarRapat);
 
 // Form rapat baru
-router.get('/new', authMiddleware.isAuthenticated, rapatController.showFormCreateRapat);
+router.get('/new', rapatController.showFormCreateRapat);
 
 // Simpan rapat baru
-router.post('/new', authMiddleware.isAuthenticated, rapatController.createRapat);
+router.post('/new', rapatController.createRapat);
 
 // Detail rapat
-router.get('/detail/:id', authMiddleware.isAuthenticated, rapatController.getDetailRapat);
+router.get('/detail/:id', rapatController.getDetailRapat);
 
 // Menampilkan formulir edit rapat
 router.get('/edit/:id', rapatController.getEditRapat);
@@ -25,21 +28,19 @@ router.post('/edit/:id', rapatController.updateRapat);
 // Route untuk daftar rapat yang akan datang
 router.get('/jadwal', rapatController.getUpcomingRapat);
 
-// R    oute untuk menghapus rapat
-router.post('/delete/:id', authMiddleware.isAuthenticated, rapatController.deleteRapat);
+// Route untuk menghapus rapat
+router.post('/delete/:id', rapatController.deleteRapat);
 
 // Route untuk menampilkan riwayat rapat
-router.get('/riwayat', authMiddleware.isAuthenticated, rapatController.getRiwayatRapat);
+router.get('/riwayat', rapatController.getRiwayatRapat);
 
 // Route untuk ekspor riwayat rapat ke PDF
-router.get('/riwayat/pdf', authMiddleware.isAuthenticated, rapatController.exportRiwayatToPDF);
+router.get('/riwayat/pdf', rapatController.exportRiwayatToPDF);
 
 // Route untuk halaman absensi
-router.get('/absensi/:id', authMiddleware.isAuthenticated, rapatController.getAbsensiPage);
+router.get('/absensi/:id', rapatController.getAbsensiPage);
 
 // Route untuk ekspor daftar rapat yang akan datang ke PDF
-router.get('/export/upcoming/rapat/pdf', authMiddleware.isAuthenticated, rapatController.exportUpcomingRapatToPDF);
-
-
+router.get('/export/upcoming/rapat/pdf', rapatController.exportUpcomingRapatToPDF);
 
 module.exports = router;

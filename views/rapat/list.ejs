@@ -9,48 +9,92 @@
 </head>
 
 <body class="bg-gray-100 font-sans antialiased">
-    <div class="flex">
+    <div class="flex min-h-screen">
         <% include ../partials/sidebarAdmin %> <!-- Menambahkan sidebar -->
-            <div class="flex-1 p-4">
-                <div class="container mx-auto bg-white p-6 rounded-lg shadow-md mt-8">
-                    <h1 class="text-3xl font-bold mb-6 text-gray-800">Daftar Rapat</h1>
-
-                    <div class="flex justify-end mb-6">
+            <div class="flex-1 p-6">
+                <div class="container mx-auto bg-white p-6 rounded-lg shadow-md">
+                    <!-- Header dengan icon -->
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 class="text-3xl font-bold text-gray-800">Daftar Rapat</h1>
+                                <p class="text-gray-600 mt-1">Kelola semua rapat yang telah dibuat</p>
+                            </div>
+                        </div>
                         <a href="/rapat/new"
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
+                            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 shadow-lg hover:shadow-xl flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
                             Buat Rapat
                         </a>
                     </div>
 
-                    <% if (rapat.length> 0) { %>
+                    <% if (rapat.length > 0) { %>
                         <div class="space-y-4">
-                            <% rapat.forEach(r=> { %>
-                                <div class="border border-gray-200 rounded-md p-4 flex justify-between items-center">
-                                    <div>
-                                        <h2 class="text-xl font-semibold text-gray-800">
-                                            <%= r.judul %>
-                                        </h2>
-                                        <p class="text-gray-600">
-                                            <%= r.tanggal.toLocaleDateString('id-ID', { weekday: 'long' , day: 'numeric'
-                                                , month: 'long' , year: 'numeric' }) %>
-                                        </p>
-                                    </div>
-                                    <div class="flex space-x-4">
-                                        <a href="/rapat/detail/<%= r.id_rapat %>"
-                                            class="bg-orange-300 hover:bg-orange-400 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
-                                            Lihat Detail
-                                        </a>
-                                        <a href="/rapat/absensi/<%= r.id_rapat %>"
-                                            class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
-                                            Absensi
-                                        </a>
+                            <% rapat.forEach(r => { %>
+                                <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all duration-200">
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex-1">
+                                            <div class="flex items-center mb-2">
+                                                <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                                <h2 class="text-xl font-semibold text-gray-800">
+                                                    <%= r.judul %>
+                                                </h2>
+                                            </div>
+                                            <div class="flex items-center text-gray-600 mb-2">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                                <span>
+                                                    <%= r.tanggal.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) %>
+                                                </span>
+                                            </div>
+                                            <div class="flex items-center text-gray-600">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                </svg>
+                                                <span><%= r.tempat %></span>
+                                            </div>
+                                        </div>
+                                        <div class="flex space-x-3">
+                                            <a href="/rapat/detail/<%= r.id_rapat %>"
+                                                class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                </svg>
+                                                Detail
+                                            </a>
+                                            <a href="/rapat/absensi/<%= r.id_rapat %>"
+                                                class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                Absensi
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                                <% }) %>
+                            <% }) %>
                         </div>
-                        <% } else { %>
-                            <p class="text-gray-600 text-center py-8">Belum ada rapat terdaftar.</p>
-                            <% } %>
+                    <% } else { %>
+                        <div class="text-center py-12">
+                            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            <p class="text-gray-600 text-lg">Belum ada rapat terdaftar.</p>
+                            <p class="text-gray-500 mt-2">Mulai dengan membuat rapat baru</p>
+                        </div>
+                    <% } %>
                 </div>
             </div>
     </div>

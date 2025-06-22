@@ -2,6 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const notulensiController = require('../controllers/notulensiController');
+const { isAuthenticated } = require('../middleware/authMiddleware');
+
+// Terapkan middleware autentikasi ke semua route
+router.use(isAuthenticated);
 
 // Daftar Notulensi (main view)
 router.get('/', notulensiController.getDaftarNotulensi);

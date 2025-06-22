@@ -9,19 +9,47 @@
     <link rel="stylesheet" href="/stylesheets/output.css">
 </head>
 
-<body class="bg-gray-100">
-    <div class="flex min-h-screen">
+<body class="bg-gray-100 font-sans antialiased">
+    <div class="flex">
         <% include ../partials/sidebar %> <!-- Sidebar di kiri -->
 
         <div class="flex-1 p-6">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">Selamat Datang di Dashboard</h1>
+            <!-- Header Dashboard -->
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">Dashboard User</h1>
+                <p class="text-gray-600">Departemen Sistem Informasi.</p>
+            </div>
 
-            <% if (upcomingRapat) { %>
+            <!-- Pengumuman -->
+            <div class="bg-blue-100 p-6 rounded-md mb-6">
+                <h2 class="text-xl font-semibold text-blue-700 mb-2">Pengumuman Rapat DSI</h2>
+                <p class="text-gray-600">Jangan lewatkan rapat penting yang akan datang. Pastikan Anda hadir tepat waktu.</p>
+            </div>
+
+            <!-- Rapat yang Akan Datang -->
+            <% if (upcomingRapat.length > 0) { %>
                 <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-                    <h2 class="text-2xl font-semibold text-orange-500 mb-2">Pengumuman Rapat DSI</h2>
-                    <p class="text-gray-600">Judul Rapat: <%= upcomingRapat.judul %></p>
-                    <p class="text-gray-600">Tanggal Rapat: <%= new Date(upcomingRapat.tanggal).toLocaleDateString('id-ID') %></p>
+                    <h2 class="text-2xl font-semibold text-orange-500 mb-4">Rapat yang Akan Datang</h2>
+
+                    <% upcomingRapat.forEach(item => { %>
+                        <div class="mb-4">
+                            <p class="text-gray-600"><strong>Judul Rapat:</strong> <%= item.judul %></p>
+                            <p class="text-gray-600"><strong>Tanggal Rapat:</strong> <%= new Date(item.tanggal).toLocaleDateString('id-ID') %></p>
+                        </div>
+                    <% }) %>
                 </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-center mt-4">
+                    <% if (currentPage > 1) { %>
+                        <a href="/pengguna/dashboard?page=<%= currentPage - 1 %>" class="px-4 py-2 bg-blue-500 text-white rounded-md">Previous</a>
+                    <% } %>
+
+                    <% if (currentPage < totalPages) { %>
+                        <a href="/pengguna/dashboard?page=<%= currentPage + 1 %>" class="px-4 py-2 bg-blue-500 text-white rounded-md">Next</a>
+                    <% } %>
+                </div>
+
             <% } else { %>
                 <p class="text-gray-600">Tidak ada rapat yang akan datang.</p>
             <% } %>

@@ -7,46 +7,95 @@
     <title>
         <%= title %>
     </title>
+    <link rel='stylesheet' href='/stylesheets/output.css' />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 min-h-screen p-8 antialiased">
-    <div class="max-w-10xl mx-auto">
-        <div class="flex items-center mb-8">
-            <button onclick="window.location.href='/admin/list'"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded-lg shadow-md transition duration-300 ease-in-out text-base flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-                        clip-rule="evenodd" />
-                </svg>
-                Kembali
-            </button>
-            <h1 class="text-3xl font-extrabold text-gray-900 ml-6">Statistika Kehadiran Rapat</h1>
-        </div>
+<body class="bg-gray-100 font-sans antialiased">
+    <div class="flex">
+        <% include ../partials/sidebarAdmin %>
+            <div class="flex-1 p-4">
+                <div class="container mx-auto">
+                    <!-- Header dengan icon -->
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-4">
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-800">Statistika Kehadiran Rapat</h1>
+                            <p class="text-gray-600 mt-1">Analisis data kehadiran rapat dalam sistem</p>
+                        </div>
+                    </div>
 
-        <div class="bg-white rounded-xl shadow-lg p-7 mb-8 border border-gray-200">
-            <canvas id="attendanceChart" class="w-full" height="350"></canvas>
-        </div>
+                    <!-- Chart Section -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                            </svg>
+                            Grafik Kehadiran Rapat
+                        </h2>
+                        <div class="h-80">
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
+                    </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div
-                class="bg-white rounded-xl shadow-md p-6 text-center border border-gray-200 transform hover:scale-105 transition duration-300 ease-in-out">
-                <h3 class="text-base text-gray-600 mb-2 font-semibold">Total Rapat</h3>
-                <p class="text-3xl font-extrabold text-blue-700" id="totalMeetings">-</p>
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-600">Total Rapat</h3>
+                                    <p class="text-2xl font-bold text-gray-800" id="totalMeetings">-</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-600">Rata-rata Kehadiran</h3>
+                                    <p class="text-2xl font-bold text-gray-800" id="avgAttendance">-</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-600">Kehadiran Tertinggi</h3>
+                                    <p class="text-2xl font-bold text-gray-800" id="maxAttendance">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Back Button -->
+                    <div class="flex justify-start">
+                        <a href="/pengguna"
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md transition duration-300 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            Kembali ke Daftar Pengguna
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div
-                class="bg-white rounded-xl shadow-md p-6 text-center border border-gray-200 transform hover:scale-105 transition duration-300 ease-in-out">
-                <h3 class="text-base text-gray-600 mb-2 font-semibold">Rata-rata Kehadiran</h3>
-                <p class="text-3xl font-extrabold text-green-700" id="avgAttendance">-</p>
-            </div>
-            <div
-                class="bg-white rounded-xl shadow-md p-6 text-center border border-gray-200 transform hover:scale-105 transition duration-300 ease-in-out">
-                <h3 class="text-base text-gray-600 mb-2 font-semibold">Kehadiran Tertinggi</h3>
-                <p class="text-3xl font-extrabold text-orange-700" id="maxAttendance">-</p>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -70,16 +119,16 @@
                 datasets: [{
                     label: 'Jumlah Kehadiran',
                     data: values,
-                    borderColor: '#2563EB', // Biru yang lebih gelap
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)', // Sedikit lebih pekat
-                    borderWidth: 2.5, // Sedikit lebih tebal
+                    borderColor: '#2563EB',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
                     fill: true,
-                    tension: 0.4, // Sedikit lebih melengkung
-                    pointBackgroundColor: '#2563EB', // Warna titik data
+                    tension: 0.4,
+                    pointBackgroundColor: '#2563EB',
                     pointBorderColor: '#fff',
-                    pointBorderWidth: 1,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
                 }]
             },
             options: {
@@ -92,9 +141,9 @@
                         labels: {
                             font: {
                                 size: 14,
-                                weight: '600' // Font semi-bold untuk legenda
+                                weight: '600'
                             },
-                            color: '#333'
+                            color: '#374151'
                         }
                     },
                     tooltip: {
@@ -106,32 +155,32 @@
                         bodyFont: {
                             size: 14
                         },
-                        padding: 10,
-                        cornerRadius: 6
+                        padding: 12,
+                        cornerRadius: 8
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
                         grid: {
-                            color: '#E5E7EB' // Warna grid yang lebih terang
+                            color: '#E5E7EB'
                         },
                         ticks: {
                             font: {
                                 size: 12
                             },
-                            color: '#555'
+                            color: '#6B7280'
                         }
                     },
                     x: {
                         grid: {
-                            display: false // Sembunyikan grid vertikal
+                            display: false
                         },
                         ticks: {
                             font: {
                                 size: 12
                             },
-                            color: '#555'
+                            color: '#6B7280'
                         }
                     }
                 }
