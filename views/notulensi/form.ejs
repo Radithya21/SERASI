@@ -30,7 +30,7 @@
                     </div>
                 <% } %>
 
-                <form action="<%= isEdit ? '/notulensi/edit/' + notulensi.id_notulen : '/notulensi/new' %>" method="POST" class="space-y-4">
+                <form action="<%= isEdit ? '/notulensi/edit/' + notulensi.id_notulen : '/notulensi/new' %>" method="POST" class="space-y-4" enctype="multipart/form-data">
                     <div>
                         <label for="rapatId" class="block text-sm font-medium text-gray-700">Pilih Rapat</label>
                         <select id="rapatId" name="rapatId"
@@ -50,13 +50,10 @@
                     </div>
 
                     <div>
-                        <label for="dokumentasi" class="block text-sm font-medium text-gray-700">Dokumentasi (Nama File)</label>
-                        <input type="file" id="dokumentasi" name="dokumentasi"
-                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Contoh: FotoRapat.png (Tidak disimpan langsung ke notulensi ini)"
-                            value="<%= (notulensi && notulensi.rapat && notulensi.rapat.dokumen && notulensi.rapat.dokumen.length > 0) ? notulensi.rapat.dokumen[0].nama_file : '' %>"
-                            >
-                        <p class="mt-1 text-sm text-gray-500">Catatan: Pengelolaan dokumen dilakukan melalui modul Dokumen Rapat. Ini hanya tampilan.</p>
+                        <label for="dokumentasi" class="block text-sm font-medium text-gray-700">Upload Dokumentasi (bisa lebih dari satu)</label>
+                        <input type="file" id="dokumentasi" name="dokumentasi" multiple accept="image/*,application/pdf"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <p class="mt-1 text-sm text-gray-500">Anda dapat mengupload beberapa file dokumentasi (gambar atau PDF) sekaligus.</p>
                     </div>
                     
                     <div>

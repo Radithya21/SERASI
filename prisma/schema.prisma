@@ -74,6 +74,7 @@ model Notulen_Rapat {
   // Relasi
   rapat          Rapat     @relation(fields: [id_rapat], references: [id_rapat])
   pengguna       Pengguna  @relation(fields: [created_by], references: [id_pengguna])
+  dokumentasi    Dokumentasi[]
 }
 
 model Dokumen_Rapat {
@@ -83,6 +84,7 @@ model Dokumen_Rapat {
   ukuran_file     Int
   tipe_file       String          @db.VarChar(50)
   uploaded_by     Int
+  path_file   String
   created_at      DateTime        @default(now())
 
   // Relasi
@@ -102,4 +104,14 @@ model Pengumuman {
   // Relasi
   rapat             Rapat?        @relation(fields: [id_rapat], references: [id_rapat])
   pengguna          Pengguna      @relation(fields: [created_by], references: [id_pengguna])
+}
+
+model Dokumentasi {
+  id_dokumentasi Int      @id @default(autoincrement())
+  id_notulen     Int
+  nama_file      String
+  path_file      String 
+  uploaded_at    DateTime @default(now())
+
+  notulensi      Notulen_Rapat @relation(fields: [id_notulen], references: [id_notulen])
 }

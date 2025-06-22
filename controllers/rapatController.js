@@ -222,10 +222,46 @@ exports.getRiwayatRapat = async (req, res, next) => {
             },
         });
 
-        // Kirim data riwayat rapat ke tampilan
+        // Hitung statistik jumlah rapat per bulan
+        const statistik = {};
+        riwayatRapat.forEach(item => {
+            const date = new Date(item.tanggal);
+            const bulan = date.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+            statistik[bulan] = (statistik[bulan] || 0) + 1;
+        });
+
+        // Hitung statistik jumlah rapat per minggu
+        const statistikMingguan = { labels: [], data: [] };
+        if (riwayatRapat.length > 0) {
+            // Buat map: key = 'YYYY-WW', value = jumlah rapat
+            const weekMap = {};
+            riwayatRapat.forEach(item => {
+                const date = new Date(item.tanggal);
+                // Mendapatkan tahun dan minggu ke berapa
+                const year = date.getFullYear();
+                // ISO week number
+                const firstJan = new Date(date.getFullYear(), 0, 1);
+                const days = Math.floor((date - firstJan) / (24 * 60 * 60 * 1000));
+                const week = Math.ceil((date.getDay() + 1 + days) / 7);
+                const key = `${year}-Minggu ${week}`;
+                weekMap[key] = (weekMap[key] || 0) + 1;
+            });
+            // Urutkan key secara kronologis
+            const sortedKeys = Object.keys(weekMap).sort((a, b) => {
+                const [yA, wA] = a.split('-Minggu ').map(Number);
+                const [yB, wB] = b.split('-Minggu ').map(Number);
+                return yA !== yB ? yA - yB : wA - wB;
+            });
+            statistikMingguan.labels = sortedKeys;
+            statistikMingguan.data = sortedKeys.map(k => weekMap[k]);
+        }
+
+        // Kirim data riwayat rapat dan statistik ke tampilan
         res.render('rapat/riwayat', {
             title: 'Riwayat Rapat',
             rapat: riwayatRapat, // Data rapat yang sudah selesai
+            statistik, // Data statistik rapat per bulan
+            statistikMingguan // Data statistik rapat per minggu untuk Chart.js
         });
     } catch (err) {
         next(err);
@@ -268,8 +304,8 @@ exports.exportRiwayatToPDF = async (req, res, next) => {
         
         // Garis Bawah Header
         doc.moveTo(columnWidths[0], tableTop + rowHeight)
-           .lineTo(columnWidths[0] + columnWidths[0] + columnWidths[1] + columnWidths[2], tableTop + rowHeight)
-           .stroke();
+        .lineTo(columnWidths[0] + columnWidths[0] + columnWidths[1] + columnWidths[2], tableTop + rowHeight)
+        .stroke();
 
         let currentRow = tableTop + rowHeight + 10;
         
@@ -284,8 +320,8 @@ exports.exportRiwayatToPDF = async (req, res, next) => {
 
             // Garis Bawah Baris Data
             doc.moveTo(columnWidths[0], currentRow + rowHeight)
-               .lineTo(columnWidths[0] + columnWidths[0] + columnWidths[1] + columnWidths[2], currentRow + rowHeight)
-               .stroke();
+            .lineTo(columnWidths[0] + columnWidths[0] + columnWidths[1] + columnWidths[2], currentRow + rowHeight)
+            .stroke();
 
             currentRow += rowHeight + 10;
         });
@@ -428,8 +464,8 @@ exports.exportUpcomingRapatToPDF = async (req, res, next) => {
 
         // Garis Bawah Header
         doc.moveTo(columnWidths[0], tableTop + rowHeight)
-           .lineTo(columnWidths[0] + columnWidths[0] + columnWidths[1] + columnWidths[2], tableTop + rowHeight)
-           .stroke();
+        .lineTo(columnWidths[0] + columnWidths[0] + columnWidths[1] + columnWidths[2], tableTop + rowHeight)
+        .stroke();
 
         let currentRow = tableTop + rowHeight + 10;
 
@@ -444,8 +480,8 @@ exports.exportUpcomingRapatToPDF = async (req, res, next) => {
 
             // Garis Bawah Baris Data
             doc.moveTo(columnWidths[0], currentRow + rowHeight)
-               .lineTo(columnWidths[0] + columnWidths[0] + columnWidths[1] + columnWidths[2], currentRow + rowHeight)
-               .stroke();
+            .lineTo(columnWidths[0] + columnWidths[0] + columnWidths[1] + columnWidths[2], currentRow + rowHeight)
+            .stroke();
 
             currentRow += rowHeight + 10;
         });
@@ -456,6 +492,49 @@ exports.exportUpcomingRapatToPDF = async (req, res, next) => {
         doc.pipe(res);
         doc.end();
 
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Statistik mingguan rapat (untuk halaman /riwayat/statistik)
+exports.getStatistikMingguan = async (req, res, next) => {
+    try {
+        const riwayatRapat = await prisma.rapat.findMany({
+            where: {
+                tanggal: {
+                    lt: new Date(),
+                },
+            },
+            orderBy: {
+                tanggal: 'desc',
+            },
+        });
+        // Hitung statistik jumlah rapat per minggu
+        const statistikMingguan = { labels: [], data: [] };
+        if (riwayatRapat.length > 0) {
+            const weekMap = {};
+            riwayatRapat.forEach(item => {
+                const date = new Date(item.tanggal);
+                const year = date.getFullYear();
+                const firstJan = new Date(date.getFullYear(), 0, 1);
+                const days = Math.floor((date - firstJan) / (24 * 60 * 60 * 1000));
+                const week = Math.ceil((date.getDay() + 1 + days) / 7);
+                const key = `${year}-Minggu ${week}`;
+                weekMap[key] = (weekMap[key] || 0) + 1;
+            });
+            const sortedKeys = Object.keys(weekMap).sort((a, b) => {
+                const [yA, wA] = a.split('-Minggu ').map(Number);
+                const [yB, wB] = b.split('-Minggu ').map(Number);
+                return yA !== yB ? yA - yB : wA - wB;
+            });
+            statistikMingguan.labels = sortedKeys;
+            statistikMingguan.data = sortedKeys.map(k => weekMap[k]);
+        }
+        res.render('rapat/statistik', {
+            title: 'Statistik Rapat per Minggu',
+            statistikMingguan
+        });
     } catch (err) {
         next(err);
     }

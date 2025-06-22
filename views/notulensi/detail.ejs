@@ -46,13 +46,21 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Dokumentasi Rapat</label>
-                        <div class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-gray-50 text-gray-800">
-                            <% if (notulensi.rapat && notulensi.rapat.dokumen && notulensi.rapat.dokumen.length > 0) { %>
-                                <% notulensi.rapat.dokumen.forEach(doc => { %>
-                                    <p><%= doc.nama_file %> (<%= doc.tipe_file %>, <%= (doc.ukuran_file / 1024).toFixed(2) %> KB)</p>
+                        <div class="mt-1 flex flex-wrap gap-4">
+                            <% if (notulensi.dokumentasi && notulensi.dokumentasi.length > 0) { %>
+                                <% notulensi.dokumentasi.forEach(doc => { %>
+                                    <% if (doc.path_file.endsWith('.pdf')) { %>
+                                        <a href="<%= doc.path_file.startsWith('/') ? doc.path_file : '/' + doc.path_file %>" target="_blank" class="flex flex-col items-center text-xs text-blue-600 underline">
+                                            <svg class="w-10 h-10 mb-1 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 20h9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19.5a2.121 2.121 0 01-3-3L16.5 3.5z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            PDF
+                                        </a>
+                                    <% } else { %>
+                                        <img src="<%= doc.path_file.startsWith('/') ? doc.path_file : '/' + doc.path_file %>" alt="dokumentasi" class="w-32 h-32 object-cover rounded border" />
+                                    <% } %>
                                 <% }); %>
-                            <% } else { %>
-                                Tidak ada dokumentasi terkait rapat ini.
                             <% } %>
                         </div>
                     </div>
