@@ -6,6 +6,8 @@
         <%= title %>
     </title>
     <link rel='stylesheet' href='/stylesheets/output.css' />
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="bg-gray-100 font-sans antialiased">
@@ -20,7 +22,7 @@
                             weekday: 'long' , day: 'numeric' , month: 'long' , year: 'numeric' }) %>
                     </h3>
 
-                    <form action="/pengguna/absensi/<%= rapat.id_rapat %>" method="POST">
+                    <form id="absensiForm" action="/pengguna/absensi/<%= rapat.id_rapat %>" method="POST">
                         <table class="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
                             <thead class="bg-gray-100">
                                 <tr>
@@ -54,20 +56,79 @@
                                     <% }) %>
                             </tbody>
                         </table>
-                        <div class="mt-6">
-                            <button type="submit"
-                                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
-                                Simpan Absensi
-                            </button>
-                            <a href="/pengguna/exportAbsensi/<%= rapat.id_rapat %>"
-                                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300 ml-4">
-                                Export Absensi
+                        <div class="mt-6 flex justify-between items-center">
+                            <a href="/admin/list"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-md transition duration-300 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                                Kembali
                             </a>
+                            <div class="flex space-x-4">
+                                <button type="submit"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300 flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Simpan Absensi
+                                </button>
+                                <a href="/pengguna/exportAbsensi/<%= rapat.id_rapat %>"
+                                    class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300 flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    Export Absensi
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
     </div>
+
+    <script>
+        // Menangani submit form dengan SweetAlert2
+        document.getElementById('absensiForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Tampilkan loading
+            Swal.fire({
+                title: 'Menyimpan...',
+                text: 'Sedang menyimpan data absensi',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Submit form secara programatik
+            this.submit();
+        });
+
+        // Cek apakah ada pesan flash untuk menampilkan notifikasi berhasil
+        var successMsg = '<%= typeof success_msg !== "undefined" ? success_msg : "" %>';
+        var errorMsg = '<%= typeof error_msg !== "undefined" ? error_msg : "" %>';
+
+        if (successMsg && successMsg.length > 0) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: successMsg,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            });
+        }
+
+        if (errorMsg && errorMsg.length > 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: errorMsg,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+        }
+    </script>
 </body>
 
 </html>

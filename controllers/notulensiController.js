@@ -2,6 +2,28 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const PDFDocument = require('pdfkit');
+const multer = require('multer');
+const path = require('path');
+
+// Konfigurasi Multer untuk upload dokumentasi dengan validasi file
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/dokumentasi'), // Ubah ke uploads/dokumentasi (bukan public/uploads/dokumentasi)
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
+});
+function fileFilter (req, file, cb) {
+  const allowedTypes = [
+    'image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'application/pdf'
+  ];
+  if (!allowedTypes.includes(file.mimetype)) {
+    return cb(new Error('Hanya file gambar (jpg, jpeg, png, webp) dan PDF yang diperbolehkan!'), false);
+  }
+  cb(null, true);
+}
+exports.uploadDokumentasi = multer({ 
+  storage,
+  fileFilter,
+  limits: { fileSize: 2 * 1024 * 1024 } // 2MB
+});
 
 
 exports.getDaftarNotulensi = async (req, res, next) => {
@@ -61,41 +83,35 @@ exports.showFormCreateNotulensi = async (req, res) => {
     }
 };
 
-exports.createNotulensi = async (req, res, next) => {
-    // ... (kode yang sama seperti sebelumnya, tambahkan console.log jika diperlukan)
-    const { judul, isi_notulen, status, rapatId } = req.body;
-    const userId = req.session.user ? req.session.user.id_pengguna : 1; 
+exports.createNotulensi = async (req, res) => {
+  try {
+    // 1. Simpan notulensi dulu
+    const notulensi = await prisma.notulen_Rapat.create({
+      data: {
+        id_rapat: parseInt(req.body.rapatId),
+        isi_notulen: req.body.isi_notulen,
+        status: req.body.status || 'draft',
+        created_by: req.user ? req.user.id_pengguna : 1 // fallback jika tidak ada auth
+      }
+    });
 
-    try {
-        console.log('Memulai createNotulensi dengan data:', { judul, isi_notulen, status, rapatId, userId });
-        const existingNotulen = await prisma.notulen_Rapat.findUnique({
-            where: { id_rapat: parseInt(rapatId) }
-        });
-
-        if (existingNotulen) {
-            console.warn(`Rapat ID ${rapatId} sudah memiliki notulensi.`);
-            req.flash('error', 'Rapat ini sudah memiliki notulensi.');
-            return res.redirect(`/notulensi/detail/${existingNotulen.id_notulen}`);
-        }
-
-        const newNotulen = await prisma.notulen_Rapat.create({
-            data: {
-                id_rapat: parseInt(rapatId),
-                isi_notulen: isi_notulen,
-                status: status || 'draft',
-                created_by: userId,
-                published_at: (status === 'uploaded') ? new Date() : null,
-            }
-        });
-        console.log('Notulensi berhasil dibuat:', newNotulen.id_notulen);
-        req.flash('success', 'Notulensi berhasil dibuat!');
-        res.redirect(`/notulensi/detail/${newNotulen.id_notulen}`);
-    } catch (error) {
-        console.error('ERROR di createNotulensi:', error);
-        console.error(error.stack);
-        req.flash('error', 'Gagal membuat notulensi. Pastikan semua bidang terisi dan rapat belum memiliki notulensi.');
-        next(error);
+    // 2. Simpan dokumentasi (jika ada file)
+    if (req.files && req.files.length > 0) {
+      const doks = req.files.map(file => ({
+        id_notulen: notulensi.id_notulen,
+        nama_file: file.originalname,
+        path_file: path.posix.join('/uploads/dokumentasi', file.filename) // pastikan path selalu benar
+      }));
+      await prisma.dokumentasi.createMany({ data: doks });
     }
+
+    req.flash('success', 'Notulensi dan dokumentasi berhasil disimpan!');
+    res.redirect('/notulensi');
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Gagal menyimpan notulensi');
+    res.redirect('back');
+  }
 };
 
 exports.getDetailNotulensi = async (req, res, next) => {
@@ -106,11 +122,8 @@ exports.getDetailNotulensi = async (req, res, next) => {
         const notulensi = await prisma.notulen_Rapat.findUnique({
             where: { id_notulen: parseInt(id) },
             include: {
-                rapat: {
-                    include: {
-                        dokumen: true
-                    }
-                }
+                rapat: true,
+                dokumentasi: true
             }
         });
 
@@ -173,17 +186,14 @@ exports.showFormEditNotulensi = async (req, res, next) => {
 };
 
 exports.updateNotulensi = async (req, res, next) => {
-    // ... (kode yang sama seperti sebelumnya, tambahkan console.log jika diperlukan)
     const { id } = req.params;
-    const { isi_notulen, status, rapatId } = req.body;
-
+    const { isi_notulen, status } = req.body;
     try {
         console.log(`Memulai updateNotulensi untuk ID: ${id} dengan status: ${status}`);
         const updatedData = {
             isi_notulen: isi_notulen,
             status: status || 'draft',
         };
-
         if (status === 'uploaded') {
             const currentNotulen = await prisma.notulen_Rapat.findUnique({
                 where: { id_notulen: parseInt(id) },
@@ -196,18 +206,27 @@ exports.updateNotulensi = async (req, res, next) => {
         } else {
             updatedData.published_at = null;
         }
-
         const updatedNotulen = await prisma.notulen_Rapat.update({
             where: { id_notulen: parseInt(id) },
             data: updatedData
         });
-        console.log('Notulensi berhasil diperbarui:', updatedNotulen.id_notulen);
+        // Proses upload dokumentasi tambahan (jika ada file)
+        if (req.files && req.files.length > 0) {
+            const doks = req.files.map(file => ({
+                id_notulen: updatedNotulen.id_notulen,
+                nama_file: file.originalname,
+                path_file: path.posix.join('/uploads/dokumentasi', file.filename) // pastikan path selalu benar
+            }));
+            await prisma.dokumentasi.createMany({ data: doks });
+        }
         req.flash('success', 'Notulensi berhasil diperbarui!');
         res.redirect(`/notulensi/detail/${updatedNotulen.id_notulen}`);
     } catch (error) {
-        console.error('ERROR di updateNotulensi:', error);
-        console.error(error.stack);
-        req.flash('error', 'Gagal memperbarui notulensi. Pastikan tidak ada duplikasi rapat.');
+        let msg = error.message || 'Gagal memperbarui notulensi.';
+        if (error.code === 'LIMIT_FILE_SIZE') {
+            msg = 'Ukuran file terlalu besar (maksimal 2MB per file).';
+        }
+        req.flash('error', msg);
         next(error);
     }
 };
@@ -238,7 +257,7 @@ exports.getDraftNotulensi = async (req, res, next) => {
         const draftNotulensiList = await prisma.notulen_Rapat.findMany({
             where: { status: 'draft' },
             orderBy: { updated_at: 'desc' },
-            include: { rapat: true }
+            include: { rapat: true, dokumentasi: true }
         });
         console.log(`Berhasil mengambil ${draftNotulensiList.length} draft notulensi.`);
         res.render('notulensi/drafts', { 
@@ -262,12 +281,13 @@ exports.exportNotulensi = async (req, res, next) => {
         console.log(`Memulai exportNotulensi untuk ID: ${id}`);
         const notulensi = await prisma.notulen_Rapat.findUnique({
             where: { id_notulen: parseInt(id) },
-            include: { 
+            include: {
                 rapat: {
                     include: {
                         dokumen: true
                     }
-                } 
+                },
+                dokumentasi: true
             }
         });
 
@@ -363,7 +383,7 @@ exports.exportNotulensi = async (req, res, next) => {
             .text(`${notulensi.published_at ? new Date(notulensi.published_at).toLocaleDateString('id-ID') : '-'}`)
             .moveDown();
 
-        // Dokumentasi Terkait
+        // Dokumentasi Terkait (Dari tabel Dokumentasi)
         doc
             .fontSize(13)
             .font('Helvetica-Bold')
@@ -371,12 +391,13 @@ exports.exportNotulensi = async (req, res, next) => {
             .text('Dokumentasi Terkait', { underline: true })
             .moveDown(0.5);
         doc.font('Helvetica').fillColor('black');
-        if (rapat?.dokumen?.length > 0) {
-            rapat.dokumen.forEach((docItem, i) => {
-                doc.text(`${i + 1}. ${docItem.nama_file}`);
+        if (notulensi.dokumentasi && notulensi.dokumentasi.length > 0) {
+            notulensi.dokumentasi.forEach((docItem, i) => {
+                const url = `${req.protocol}://${req.get('host')}${docItem.path_file}`;
+                doc.text(`${i + 1}. ${docItem.nama_file} [Lihat](${url})`, { link: url, underline: true });
             });
         } else {
-            doc.text('Tidak ada dokumen terkait.');
+            doc.text('Tidak ada dokumentasi terkait.');
         }
 
         // Footer

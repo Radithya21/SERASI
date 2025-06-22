@@ -1,138 +1,68 @@
-<!DOCTYPE html>
-<html lang="id">
+<div class="h-screen w-64 flex flex-col items-start p-6 text-white shadow-2xl relative bg-gradient-to-br from-orange-500 via-orange-600 to-red-600 overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-10 left-10 w-32 h-32 rounded-full bg-white"></div>
+        <div class="absolute bottom-20 right-8 w-24 h-24 rounded-full bg-white"></div>
+        <div class="absolute top-1/2 right-4 w-16 h-16 rounded-full bg-white"></div>
+    </div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SERASI User Sidebar</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-
-        .sidebar-gradient {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #dc2626 100%);
-        }
-
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .nav-item {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 0;
-            background: rgba(255, 255, 255, 0.15);
-            transition: width 0.3s ease;
-            z-index: 0;
-        }
-
-        .nav-item:hover::before {
-            width: 100%;
-        }
-
-        .nav-item>* {
-            position: relative;
-            z-index: 1;
-        }
-
-        .logo-glow {
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-        }
-
-        .text-shadow {
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .hover-scale {
-            transition: transform 0.2s ease;
-        }
-
-        .hover-scale:hover {
-            transform: scale(1.05);
-        }
-
-        .nav-separator {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            margin: 0.5rem 0;
-        }
-    </style>
-</head>
-
-<body class="bg-gray-100">
-    <div class="sidebar-gradient h-screen w-64 flex flex-col items-start p-6 text-white shadow-2xl relative">
-        <!-- Background Pattern -->
-        <div class="absolute inset-0 opacity-10">
-            <div class="absolute top-10 left-10 w-32 h-32 rounded-full bg-white"></div>
-            <div class="absolute bottom-20 right-8 w-24 h-24 rounded-full bg-white"></div>
-            <div class="absolute top-1/2 right-4 w-16 h-16 rounded-full bg-white"></div>
+    <!-- Logo Section -->
+    <div class="flex items-center mb-8 p-4 rounded-xl w-full relative z-10 bg-white/10 backdrop-blur-md border border-white/20">
+        <img src="/images/logoSerasi.png" alt="SERASI Logo" class="w-14 h-14 mr-3 rounded-lg shadow-lg hover:scale-105 transition-transform duration-200">
+        <div>
+            <h1 class="text-xl font-bold tracking-wider drop-shadow-lg">SERASI</h1>
+            <p class="text-sm font-medium opacity-90 tracking-wide">USER PANEL</p>
         </div>
+    </div>
 
-        <!-- Logo Section -->
-        <div class="flex items-center mb-8 glass-effect p-4 rounded-xl w-full relative z-10">
-            <img src="/images/logoSerasi.png" alt="SERASI Logo" class="w-14 h-14 mr-3 logo-glow rounded-lg hover-scale">
-            <div>
-                <h1 class="text-xl font-bold tracking-wider text-shadow">SERASI</h1>
-                <p class="text-sm font-medium opacity-90 tracking-wide">USER PANEL</p>
-            </div>
-        </div>
-
-        <!-- Navigation -->
-        <nav class="flex flex-col space-y-1 w-full relative z-10">
+    <!-- Navigation -->
+    <nav class="flex flex-col justify-between w-full relative z-10 flex-grow">
+        <div>
             <a href="/pengguna/dashboard"
-                class="nav-item flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group">
+                class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mb-1">
+                <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
                 <img src="/images/Vector.png" alt="Dashboard Icon"
-                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200">
-                <span class="text-sm font-medium tracking-wide">Dashboard</span>
+                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
+                <span class="text-sm font-medium tracking-wide relative z-10">Dashboard</span>
             </a>
 
-            <div class="nav-separator"></div>
+            <div class="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent my-2"></div>
 
             <a href="/pengguna/jadwal"
-                class="nav-item flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group">
+                class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mb-1">
+                <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
                 <img src="/images/jadwal.png" alt="Jadwal Icon"
-                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200">
-                <span class="text-sm font-medium tracking-wide">Jadwal</span>
+                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
+                <span class="text-sm font-medium tracking-wide relative z-10">Jadwal</span>
             </a>
 
             <a href="/pengguna/riwayat"
-                class="nav-item flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group">
+                class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mb-1">
+                <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
                 <img src="/images/riwayat.png" alt="Riwayat Icon"
-                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200">
-                <span class="text-sm font-medium tracking-wide">Riwayat</span>
+                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
+                <span class="text-sm font-medium tracking-wide relative z-10">Riwayat</span>
             </a>
 
             <a href="/pengguna/arsip"
-                class="nav-item flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group">
+                class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mb-1">
+                <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
                 <img src="/images/arsip.png" alt="Arsip Icon"
-                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200">
-                <span class="text-sm font-medium tracking-wide">Arsip</span>
+                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
+                <span class="text-sm font-medium tracking-wide relative z-10">Arsip</span>
             </a>
+        </div>
 
-            <div class="nav-separator mt-4"></div>
+        <div>
+            <div class="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent my-2 mt-4"></div>
 
             <a href="/logout"
-                class="nav-item flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group mt-2 border-t border-white/20">
+                class="relative overflow-hidden flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 w-full group hover:bg-white/15 mt-2 border-t border-white/20">
+                <div class="absolute inset-0 bg-white/15 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0"></div>
                 <img src="/images/logout.png" alt="Logout Icon"
-                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200">
-                <span class="text-sm font-medium tracking-wide">Logout</span>
+                    class="w-6 h-6 group-hover:scale-110 transition-transform duration-200 relative z-10">
+                <span class="text-sm font-medium tracking-wide relative z-10">Logout</span>
             </a>
-        </nav>
-    </div>
-</body>
-
-</html>
+        </div>
+    </nav>
+</div> 

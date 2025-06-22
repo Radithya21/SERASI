@@ -168,13 +168,16 @@ exports.detailPengguna = async (req, res, next) => {
 exports.getAbsensiPage = async (req, res, next) => {
     const { id } = req.params;
     try {
-        const pengguna = await prisma.pengguna.findMany({
-            where: { role: 'user' },
-            orderBy: { nama: 'asc' }
-        });
-
+        // Ambil data rapat dengan peserta yang sudah ada
         const rapat = await prisma.rapat.findUnique({
-            where: { id_rapat: parseInt(id) }
+            where: { id_rapat: parseInt(id) },
+            include: {
+                peserta_rapat: {
+                    include: {
+                        pengguna: true
+                    }
+                }
+            }
         });
 
         if (!rapat) {
@@ -182,7 +185,26 @@ exports.getAbsensiPage = async (req, res, next) => {
             return res.redirect('/admin/list');
         }
 
-        res.render('admin/absensi', { title: 'Absensi Rapat', pengguna, rapat });
+        // Ambil semua pengguna dengan role 'user'
+        const semuaPengguna = await prisma.pengguna.findMany({
+            where: { role: 'user' },
+            orderBy: { nama: 'asc' }
+        });
+
+        // Gabungkan data pengguna dengan data absensi yang sudah ada
+        const penggunaDenganAbsensi = semuaPengguna.map(pengguna => {
+            const absensi = rapat.peserta_rapat.find(p => p.id_pengguna === pengguna.id_pengguna);
+            return {
+                ...pengguna,
+                status_kehadiran: absensi ? absensi.status_kehadiran : 'tidak hadir'
+            };
+        });
+
+        res.render('admin/absensi', { 
+            title: 'Absensi Rapat', 
+            pengguna: penggunaDenganAbsensi, 
+            rapat 
+        });
     } catch (error) {
         console.error('Error fetching absensi data:', error);
         req.flash('error', 'Gagal memuat halaman absensi.');
@@ -236,7 +258,7 @@ exports.saveAbsensi = async (req, res, next) => {
 
         // Kirim pesan sukses dan redirect ke halaman absensi
         req.flash('success', 'Absensi berhasil disimpan!');
-        res.redirect(`/rapat/absensi/${id}`);
+        res.redirect(`/pengguna/absensi/${id}`);
     } catch (error) {
         console.error('Error saving absensi:', error);
         req.flash('error', 'Gagal menyimpan absensi.');
@@ -437,26 +459,171 @@ exports.getDetailRiwayat = async (req, res, next) => {
 
 exports.getDashboard = async (req, res, next) => {
     try {
-        // Ambil rapat yang akan datang dengan judul "Pengumuman Rapat DSI"
-        const upcomingRapat = await prisma.rapat.findFirst({
+        const page = parseInt(req.query.page) || 1; // Halaman saat ini, default ke 1 jika tidak ada
+        const limit = 3; // Banyaknya rapat per halaman
+
+        // Hitung jumlah total rapat
+        const totalRapat = await prisma.rapat.count({
+
             where: {
                 tanggal: {
-                    gt: new Date(),  // Rapat yang tanggalnya lebih besar dari hari ini
+                    gt: new Date(), // Hanya rapat yang akan datang
                 }
             },
             orderBy: {
-                tanggal: 'asc', // Urutkan berdasarkan tanggal rapat yang akan datang
+                tanggal: 'asc' // Urutkan berdasarkan tanggal rapat yang akan datang
             }
         });
 
-        // Kirim data pengumuman rapat ke tampilan dashboard
-        res.render('pengguna/dashboard', {
-            title: 'User Dashboard',
-            upcomingRapat : upcomingRapat,
+        // Ambil rapat yang akan datang sesuai dengan halaman yang diminta
+        const upcomingRapat = await prisma.rapat.findMany({
+            where: {
+                tanggal: {
+                    gt: new Date(),  // Mencari rapat dengan tanggal lebih besar dari sekarang
+                }
+            },
+            orderBy: {
+                tanggal: 'asc',  // Urutkan berdasarkan tanggal yang paling dekat
+            },
+            skip: (page - 1) * limit,  // Skip data berdasarkan halaman
+            take: limit,  // Ambil hanya jumlah yang ditentukan per halaman
         });
+
+
+        const totalPages = Math.ceil(totalRapat / limit);  // Hitung total halaman
+
+        // Kirim data rapat ke tampilan pengguna
+        res.render('pengguna/dashboard', {
+            title: 'Dashboard Pengguna',
+            upcomingRapat: upcomingRapat,  // Kirimkan daftar rapat yang akan datang
+            currentPage: page,  // Halaman saat ini
+            totalPages: totalPages,  // Total halaman
+
+        });
+
     } catch (error) {
-        console.error('Error fetching upcoming rapat for announcement:', error);
-        req.flash('error', 'Gagal memuat pengumuman rapat.');
+        console.error("Terjadi kesalahan saat mengambil data rapat:", error);
+        req.flash('error', 'Gagal memuat rapat yang akan datang.');
+        res.redirect('/'); // Redirect jika terjadi error
+    }
+};
+
+// Arsip notulensi untuk pengguna (beserta dokumentasi)
+exports.getArsipNotulensi = async (req, res, next) => {
+    try {
+        // Ambil notulensi dengan status 'uploaded' (bukan 'published'), dan hanya yang punya dokumentasi
+        const notulensi = await prisma.notulen_Rapat.findMany({
+            where: {
+                status: 'uploaded',
+                dokumentasi: {
+                    some: {} // hanya notulensi yang punya dokumentasi
+                }
+            },
+            include: {
+                rapat: true,
+                dokumentasi: true
+            },
+            orderBy: { published_at: 'desc' }
+        });
+        res.render('pengguna/arsip', { title: 'Arsip Notulensi', notulensi });
+    } catch (error) {
+        console.error('Error fetching arsip notulensi:', error);
+        req.flash('error', 'Gagal memuat arsip notulensi.');
         next(error);
+    }
+};
+
+// Export/download notulensi beserta dokumentasi (PDF)
+exports.exportArsipNotulensi = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const notulen = await prisma.notulen_Rapat.findUnique({
+            where: { id_notulen: parseInt(id) },
+            include: {
+                rapat: true,
+                dokumentasi: true
+            }
+        });
+        if (!notulen) {
+            req.flash('error', 'Notulensi tidak ditemukan.');
+            return res.redirect('/pengguna/arsip');
+        }
+        const doc = new PDFDocument();
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="Notulensi_${notulen.rapat.judul.replace(/\s+/g, '_')}.pdf"`);
+        doc.pipe(res);
+        doc.fontSize(18).text(`Notulensi Rapat: ${notulen.rapat.judul}`, { align: 'center' });
+        doc.moveDown();
+        doc.fontSize(12).text(`Tanggal: ${new Date(notulen.rapat.tanggal).toLocaleDateString('id-ID')}`);
+        doc.text(`Tempat: ${notulen.rapat.tempat}`);
+        doc.moveDown();
+        doc.fontSize(14).text('Isi Notulensi:', { underline: true });
+        doc.fontSize(12).text(notulen.isi_notulen);
+        doc.moveDown();
+        if (notulen.dokumentasi && notulen.dokumentasi.length > 0) {
+            doc.fontSize(14).text('Dokumentasi Terkait:', { underline: true });
+            notulen.dokumentasi.forEach((dok, idx) => {
+                // Hanya tampilkan path relatif, tanpa host
+                doc.fontSize(12).fillColor('blue').text(`${idx+1}. ${dok.nama_file}`, {
+                    link: `/${dok.path_file}`,
+                    underline: true
+                });
+                doc.fillColor('black');
+            });
+        }
+        doc.end();
+    } catch (error) {
+        console.error('Error exporting notulensi arsip:', error);
+        req.flash('error', 'Gagal mengekspor notulensi.');
+        next(error);
+    }
+};
+
+// Detail arsip notulensi untuk pengguna (isi notulensi & dokumentasi di page terpisah)
+exports.getDetailArsipNotulensi = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const notulen = await prisma.notulen_Rapat.findUnique({
+            where: { id_notulen: parseInt(id) },
+            include: {
+                rapat: true,
+                dokumentasi: true
+            }
+        });
+        // Ambil semua notulensi yang sudah diunggah (selain yang sedang dibuka)
+        const notulensiLain = await prisma.notulen_Rapat.findMany({
+            where: {
+                status: 'uploaded',
+                id_notulen: { not: parseInt(id) }
+            },
+            orderBy: { published_at: 'desc' },
+            include: { rapat: true }
+        });
+        if (!notulen) {
+            req.flash('error', 'Notulensi tidak ditemukan.');
+            return res.redirect('/pengguna/arsip');
+        }
+        res.render('pengguna/arsip_detail', { title: 'Detail Arsip Notulensi', notulen, notulensiLain });
+    } catch (error) {
+        console.error('Error fetching detail arsip notulensi:', error);
+        req.flash('error', 'Gagal memuat detail arsip notulensi.');
+        next(error);
+    }
+};
+
+// Halaman notulensi sebelumnya (khusus page baru)
+exports.getArsipNotulensiSebelumnya = async (req, res, next) => {
+    try {
+        const notulensiLain = await prisma.notulen_Rapat.findMany({
+            where: { status: 'uploaded' },
+            orderBy: { published_at: 'desc' },
+            include: { rapat: true }
+        });
+        res.render('pengguna/arsip_sebelumnya', { title: 'Notulensi Sebelumnya', notulensiLain });
+    } catch (error) {
+        console.error('Error fetching notulensi sebelumnya:', error);
+        req.flash('error', 'Gagal memuat notulensi sebelumnya.');
+        next(error);
+
     }
 };

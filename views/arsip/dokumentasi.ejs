@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/stylesheets/output.css">
+</head>
+<body class="bg-[#FDF2E9] font-sans antialiased">
+  <div class="flex min-h-screen">
+    <% include ../partials/sidebarAdmin %>
+    <div class="flex-1 h-screen overflow-y-auto p-10">
+      <div class="bg-white p-8 rounded-md shadow-md">
+        <a href="/arsip" class="text-blue-600 hover:underline mb-4 inline-block flex items-center">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Kembali ke Arsip
+        </a>
+        <h1 class="text-2xl font-bold mb-6">Dokumentasi Rapat</h1>
+        <% if (dokumentasi && dokumentasi.length > 0) { %>
+          <div class="flex flex-wrap gap-6">
+            <% dokumentasi.forEach(doc => { %>
+              <% if (doc.nama_file.match(/\.(jpg|jpeg|png|gif)$/i)) { %>
+                <a href="<%= doc.path_file.startsWith('/') ? doc.path_file : '/' + doc.path_file %>" target="_blank">
+                  <img src="<%= doc.path_file.startsWith('/') ? doc.path_file : '/' + doc.path_file %>" alt="Dokumentasi" class="w-40 h-40 object-cover rounded border" />
+                </a>
+              <% } else if (doc.nama_file.match(/\.pdf$/i)) { %>
+                <a href="<%= doc.path_file.startsWith('/') ? doc.path_file : '/' + doc.path_file %>" target="_blank" class="flex flex-col items-center text-red-600 underline">
+                  <svg class="w-10 h-10 mb-1 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M7 8h10M7 12h10M7 16h10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span><%= doc.nama_file %></span>
+                </a>
+              <% } %>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <p class="text-gray-600">Tidak ada dokumentasi untuk notulensi ini.</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,68 +1,114 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title><%= title %></title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Inter', sans-serif; } </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans antialiased">
-<div class="flex min-h-screen">
-    
+<body class="bg-[#FDF2E9] font-sans antialiased">
+  <div class="flex min-h-screen">
+
     <% include ../partials/sidebarAdmin %>
 
-    <div class="flex-1 p-6">
-    <div class="container mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-3xl font-bold mb-6 text-gray-800"><%= title %></h1>
+    <div class="flex-1 h-screen overflow-y-auto p-10">
+      <div class="bg-white p-8 rounded-md shadow-md">
 
-        <% if (success_msg && success_msg.length > 0) { %>
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline"><%= success_msg %></span>
+        <!-- Judul dan Dropdown Sorting -->
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-2xl font-bold text-gray-800">Arsip Rapat</h1>
+          <form method="get" action="" class="flex items-center gap-2">
+            <label for="sort" class="text-sm text-gray-700">Urutkan:</label>
+            <select name="sort" id="sort" class="border rounded px-2 py-1 text-sm" onchange="this.form.submit()">
+              <option value="desc" <%= (sort === 'desc' || !sort) ? 'selected' : '' %>>Terbaru</option>
+              <option value="asc" <%= sort === 'asc' ? 'selected' : '' %>>Terlama</option>
+            </select>
+          </form>
         </div>
-        <% } %>
-        <% if (error_msg && error_msg.length > 0) { %>
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline"><%= error_msg %></span>
-        </div>
-        <% } %>
 
-        <% if (arsip.length === 0) { %>
-        <p class="text-gray-500">Belum ada notulensi yang diarsipkan.</p>
+        <% if (arsip && arsip.length > 0) { %>
+          <% arsip.forEach((notulensi) => { %>
+            <div class="mb-6 border p-6 rounded-md shadow-sm">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h2 class="text-xl font-semibold text-gray-800 mb-2">
+                    <%= notulensi.rapat?.judul || 'Judul Rapat Tidak Ditemukan' %>
+                  </h2>
+
+                  <!-- Tanggal -->
+                  <% if (notulensi.rapat?.tanggal) { %>
+                    <div class="flex items-center mb-1">
+                      <svg class="w-5 h-5 mr-2 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M6 2a1 1 0 00-1 1v1H5a2 2 0 00-2 2v11a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2h-.001V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zM5 8h10v9H5V8z"/>
+                      </svg>
+                      <span>
+                        <%= new Date(notulensi.rapat.tanggal).toLocaleDateString('id-ID', {
+                          day: '2-digit', month: 'long', year: 'numeric'
+                        }) %>
+                      </span>
+                    </div>
+                  <% } %>
+
+                  <!-- Tempat -->
+                  <% if (notulensi.rapat?.tempat) { %>
+                    <div class="flex items-center mb-1">
+                      <svg class="w-5 h-5 mr-2 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M4 3a2 2 0 00-2 2v11a2 2 0 002 2h7a1 1 0 100-2H4V5h12v2a1 1 0 102 0V5a2 2 0 00-2-2H4z"/>
+                      </svg>
+                      <span><%= notulensi.rapat.tempat %></span>
+                    </div>
+                  <% } %>
+
+                  <!-- Waktu -->
+                  <div class="flex items-center mb-1">
+                    <svg class="w-5 h-5 mr-2 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm.75 8.25V6a.75.75 0 00-1.5 0v4a.75.75 0 00.75.75H12a.75.75 0 000-1.5h-1.25z"/>
+                    </svg>
+                    <span><%= notulensi.rapat?.waktu || '10.00 WIB' %></span>
+                  </div>
+                </div>
+
+                <!-- Tombol Aksi -->
+                <div class="flex flex-col gap-3 items-end">
+                  <a href="/notulensi/export/<%= notulensi.id_notulen %>" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md font-semibold flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Export
+                  </a>
+                </div>
+              </div>
+
+              <!-- Tombol Detail dan Dokumentasi -->
+              <div class="mt-4 flex gap-4 pl-2">
+                <a href="/arsip/detail/<%= notulensi.id_notulen %>" class="w-32 h-36 border border-gray-300 rounded-lg bg-gray-50 shadow-sm flex flex-col items-center justify-center text-sm text-gray-700 hover:border-gray-400 text-center">
+                  <span class="font-semibold mb-1">Notulensi</span>
+                  <svg class="w-8 h-8 mb-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 16h8M8 12h8m-6 4h6M6 8h12M6 6h12M4 4h16v16H4z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span class="text-xs text-gray-500">Lihat Detail</span>
+                </a>
+
+                <a href="/arsip/dokumentasi/<%= notulensi.id_notulen %>" class="w-32 h-36 border border-gray-300 rounded-lg bg-gray-50 shadow-sm flex flex-col items-center justify-center text-sm text-gray-700 hover:border-gray-400 text-center">
+                  <span class="font-semibold mb-1">Dokumentasi</span>
+                  <svg class="w-8 h-8 mb-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M21 15V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10m18 0a2 2 0 01-2 2H5a2 2 0 01-2-2m18 0v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span class="text-xs text-gray-500">Lihat Dokumen</span>
+                </a>
+              </div>
+            </div>
+          <% }) %>
         <% } else { %>
-        <div class="overflow-x-auto">
-            <table class="table-auto w-full border mt-4">
-            <thead>
-                <tr class="bg-gray-200 text-left">
-                    <th class="p-2 border">Tanggal</th>
-                    <th class="p-2 border">Judul</th>
-                    <th class="p-2 border">Deskripsi</th>
-                    <th class="p-2 border">File</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% arsip.forEach(n => { %>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-2 border"><%= new Date(n.tanggal).toLocaleDateString('id-ID') %></td>
-                    <td class="p-2 border"><%= n.judul || '-' %></td>
-                    <td class="p-2 border"><%= n.deskripsi || '-' %></td>
-                    <td class="p-2 border">
-                    <% if (n.file) { %>
-                        <a href="/uploads/<%= n.file %>" class="text-blue-600 underline">Unduh</a>
-                    <% } else { %>
-                        <span class="text-gray-400">Belum ada file</span>
-                    <% } %>
-                    </td>
-                </tr>
-                <% }) %>
-            </tbody>
-            </table>
-        </div>
+          <p class="text-center text-gray-600">Belum ada arsip rapat yang tersedia.</p>
         <% } %>
+
+      </div>
     </div>
-    </div>
-</div>
+  </div>
 </body>
 </html>

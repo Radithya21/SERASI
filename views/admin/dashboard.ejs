@@ -10,11 +10,59 @@
 
 <body class="bg-gray-100 font-sans antialiased">
     <div class="flex">
-        <% include ../partials/sidebarAdmin %> <!-- Sidebar tetap di sisi kiri -->
-            <div class="flex-1 p-6">
-                <div class="container mx-auto bg-white p-6 rounded-lg shadow-md mt-8">
-                    <h1 class="text-3xl font-bold mb-6 text-gray-800">Admin Dashboard</h1>
-                    <p class="text-gray-600">Selamat datang, Admin!</p>
+        <% include ../partials/sidebarAdmin %>
+            <div class="flex-1 p-4">
+                <div class="container mx-auto">
+                    <!-- Header sederhana -->
+                    <div class="mb-6">
+                        <h1 class="text-2xl font-bold text-gray-800">Dashboard Admin</h1>
+                        <p class="text-gray-600">Departemen Sistem Informasi</p>
+                    </div>
+
+                    <!-- Welcome Card sederhana -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Selamat Datang, Admin!</h2>
+                        <p class="text-gray-600">Kelola sistem rapat departemen sistem informasi universitas andalas</p>
+                    </div>
+
+                    <!-- Penjelasan SERASI -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Tentang SERASI</h2>
+                        <div class="space-y-3 text-gray-600">
+                            <p><strong>SERASI</strong> adalah Sistem Manajemen Rapat Sistem Informasi yang dirancang khusus untuk departemen sistem informasi universitas andalas.</p>
+                            <p>Sistem ini memudahkan pengelolaan rapat, absensi, dan notulensi secara digital dengan fitur-fitur:</p>
+                            <ul class="list-disc list-inside ml-4 space-y-1">
+                                <li>Manajemen pengguna dan hak akses</li>
+                                <li>Penjadwalan dan pengelolaan rapat</li>
+                                <li>Pencatatan absensi digital</li>
+                                <li>Pembuatan dan penyimpanan notulensi</li>
+                                <li>Arsip dokumen rapat</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links sederhana -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Akses Cepat</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="/admin/list" class="block bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md text-center transition duration-300">
+                                <div class="flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                    </svg>
+                                    Kelola Pengguna
+                                </div>
+                            </a>
+                            <a href="/rapat" class="block bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-md text-center transition duration-300">
+                                <div class="flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                    </svg>
+                                    Kelola Rapat
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
     </div>
