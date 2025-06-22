@@ -2,6 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const penggunaController = require('../controllers/penggunaController');
+const { isAuthenticated } = require('../middleware/authMiddleware');
+
+// Terapkan middleware autentikasi ke semua route
+router.use(isAuthenticated);
 
 // Daftar semua pengguna
 router.get('/', penggunaController.getPengguna);

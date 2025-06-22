@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const arsipController = require('../controllers/arsipController'); // ✅ ini penting!
+const arsipController = require('../controllers/arsipController');
+const { isAuthenticated } = require('../middleware/authMiddleware');
+
+// Terapkan middleware autentikasi ke semua route
+router.use(isAuthenticated);
 
 // ✅ Pastikan semua function ini ada dan diekspor dari arsipController
 router.get('/', arsipController.getArsipRapat);

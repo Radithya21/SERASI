@@ -168,13 +168,16 @@ exports.detailPengguna = async (req, res, next) => {
 exports.getAbsensiPage = async (req, res, next) => {
     const { id } = req.params;
     try {
-        const pengguna = await prisma.pengguna.findMany({
-            where: { role: 'user' },
-            orderBy: { nama: 'asc' }
-        });
-
+        // Ambil data rapat dengan peserta yang sudah ada
         const rapat = await prisma.rapat.findUnique({
-            where: { id_rapat: parseInt(id) }
+            where: { id_rapat: parseInt(id) },
+            include: {
+                peserta_rapat: {
+                    include: {
+                        pengguna: true
+                    }
+                }
+            }
         });
 
         if (!rapat) {
@@ -182,7 +185,26 @@ exports.getAbsensiPage = async (req, res, next) => {
             return res.redirect('/admin/list');
         }
 
-        res.render('admin/absensi', { title: 'Absensi Rapat', pengguna, rapat });
+        // Ambil semua pengguna dengan role 'user'
+        const semuaPengguna = await prisma.pengguna.findMany({
+            where: { role: 'user' },
+            orderBy: { nama: 'asc' }
+        });
+
+        // Gabungkan data pengguna dengan data absensi yang sudah ada
+        const penggunaDenganAbsensi = semuaPengguna.map(pengguna => {
+            const absensi = rapat.peserta_rapat.find(p => p.id_pengguna === pengguna.id_pengguna);
+            return {
+                ...pengguna,
+                status_kehadiran: absensi ? absensi.status_kehadiran : 'tidak hadir'
+            };
+        });
+
+        res.render('admin/absensi', { 
+            title: 'Absensi Rapat', 
+            pengguna: penggunaDenganAbsensi, 
+            rapat 
+        });
     } catch (error) {
         console.error('Error fetching absensi data:', error);
         req.flash('error', 'Gagal memuat halaman absensi.');
@@ -236,7 +258,7 @@ exports.saveAbsensi = async (req, res, next) => {
 
         // Kirim pesan sukses dan redirect ke halaman absensi
         req.flash('success', 'Absensi berhasil disimpan!');
-        res.redirect(`/rapat/absensi/${id}`);
+        res.redirect(`/pengguna/absensi/${id}`);
     } catch (error) {
         console.error('Error saving absensi:', error);
         req.flash('error', 'Gagal menyimpan absensi.');
@@ -437,11 +459,14 @@ exports.getDetailRiwayat = async (req, res, next) => {
 
 exports.getDashboard = async (req, res, next) => {
     try {
-        // Ambil rapat yang akan datang dengan judul "Pengumuman Rapat DSI"
-        const upcomingRapat = await prisma.rapat.findFirst({
+        const page = parseInt(req.query.page) || 1; // Halaman saat ini, default ke 1 jika tidak ada
+        const limit = 3; // Banyaknya rapat per halaman
+
+        // Hitung jumlah total rapat
+        const totalRapat = await prisma.rapat.count({
             where: {
                 tanggal: {
-                    gt: new Date(),  // Rapat yang tanggalnya lebih besar dari hari ini
+                    gt: new Date(), // Hanya rapat yang akan datang
                 }
             },
             orderBy: {
@@ -449,15 +474,34 @@ exports.getDashboard = async (req, res, next) => {
             }
         });
 
-        // Kirim data pengumuman rapat ke tampilan dashboard
-        res.render('pengguna/dashboard', {
-            title: 'User Dashboard',
-            upcomingRapat : upcomingRapat,
+        // Ambil rapat yang akan datang sesuai dengan halaman yang diminta
+        const upcomingRapat = await prisma.rapat.findMany({
+            where: {
+                tanggal: {
+                    gt: new Date(),  // Mencari rapat dengan tanggal lebih besar dari sekarang
+                }
+            },
+            orderBy: {
+                tanggal: 'asc',  // Urutkan berdasarkan tanggal yang paling dekat
+            },
+            skip: (page - 1) * limit,  // Skip data berdasarkan halaman
+            take: limit,  // Ambil hanya jumlah yang ditentukan per halaman
         });
+
+        const totalPages = Math.ceil(totalRapat / limit);  // Hitung total halaman
+
+        // Kirim data rapat ke tampilan pengguna
+        res.render('pengguna/dashboard', {
+            title: 'Dashboard Pengguna',
+            upcomingRapat: upcomingRapat,  // Kirimkan daftar rapat yang akan datang
+            currentPage: page,  // Halaman saat ini
+            totalPages: totalPages,  // Total halaman
+        });
+
     } catch (error) {
-        console.error('Error fetching upcoming rapat for announcement:', error);
-        req.flash('error', 'Gagal memuat pengumuman rapat.');
-        next(error);
+        console.error("Terjadi kesalahan saat mengambil data rapat:", error);
+        req.flash('error', 'Gagal memuat rapat yang akan datang.');
+        res.redirect('/'); // Redirect jika terjadi error
     }
 };
 
